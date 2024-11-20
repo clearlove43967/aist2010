@@ -2,10 +2,24 @@ __author__ = 'marble_xu'
 
 import os
 import json
+import pyaudio
+from scipy.fftpack import fft
+import numpy as np
 import pygame as pg
 from .. import setup, tools
 from .. import constants as c
-from ..components import info, stuff, player, brick, box, enemy, powerup, coin
+from ..components import info, stuff, player, brick, box, enemy, powerup, coin, button
+
+def get_pitch(data):
+    fft_data = fft(data)
+    freqs = np.fft.fftfreq(len(fft_data), 1 / c.RATE)
+    magnitude = np.abs(fft_data)
+
+    # 找到主频率
+    peak_idx = np.argmax(magnitude)
+    peak_freq = abs(freqs[peak_idx])
+
+    return peak_freq
 
 
 class Level(tools.State):
@@ -19,6 +33,7 @@ class Level(tools.State):
         self.game_info[c.CURRENT_TIME] = current_time
         self.death_timer = 0
         self.castle_timer = 0
+        self.button_is_pressed=False
         
         self.moving_score_list = []
         self.overhead_info = info.Info(self.game_info, c.LEVEL)
@@ -27,6 +42,8 @@ class Level(tools.State):
         self.setup_maps()
         self.ground_group = self.setup_collide(c.MAP_GROUND)
         self.step_group = self.setup_collide(c.MAP_STEP)
+
+        self.setup_buttons()
         self.setup_pipe()
         self.setup_slider()
         self.setup_static_coin()
@@ -37,13 +54,31 @@ class Level(tools.State):
         self.setup_flagpole()
         self.setup_sprite_groups()
 
+        self.points = []
+        self.frequencies = []
+        self.p = pyaudio.PyAudio()
+        self.stream = self.p.open(format=pyaudio.paInt16, channels=1, rate=c.RATE, input=True, frames_per_buffer=c.CHUNK)
+        # 丢弃前几帧数据以稳定麦克风
+        for _ in range(5):
+            self.stream.read(c.CHUNK)
+
+
+
     def load_map(self):
         map_file = 'level_' + str(self.game_info[c.LEVEL_NUM]) + '.json'
         file_path = os.path.join('source', 'data', 'maps', map_file)
         f = open(file_path)
         self.map_data = json.load(f)
         f.close()
-        
+
+    def setup_buttons(self):
+        self.button_group = pg.sprite.Group()
+        if c.MAP_BUTTON in self.map_data:
+            for data in self.map_data[c.MAP_BUTTON]:
+                self.button_group.add(button.Button(data['x'], data['y'], data['type']))
+
+
+
     def setup_background(self):
         img_name = self.map_data[c.MAP_IMAGE]
         self.background = setup.GFX[img_name]
@@ -185,10 +220,11 @@ class Level(tools.State):
         self.dying_group = pg.sprite.Group()
         self.enemy_group = pg.sprite.Group()
         self.shell_group = pg.sprite.Group()
-        
         self.ground_step_pipe_group = pg.sprite.Group(self.ground_group,
                         self.pipe_group, self.step_group, self.slider_group)
         self.player_group = pg.sprite.Group(self.player)
+
+
         
     def update(self, surface, keys, current_time):
         self.game_info[c.CURRENT_TIME] = self.current_time = current_time
@@ -310,6 +346,30 @@ class Level(tools.State):
         powerup = pg.sprite.spritecollideany(self.player, self.powerup_group)
         coin = pg.sprite.spritecollideany(self.player, self.static_coin_group)
 
+
+        button =  pg.sprite.spritecollideany(self.player, self.button_group)
+        if button:
+            self.button_is_pressed=True
+            button.update(self.button_is_pressed)
+        if not button:
+            self.button_is_pressed=False
+            #button.update(self.button_is_pressed)
+            self.frequencies=[]
+            self.points=[]
+        if button and button.recording:
+            self.data = np.frombuffer(self.stream.read(c.CHUNK), dtype=np.int16) / 32768.0  # 归一化
+            self.pitch = get_pitch(self.data)  # 获取当前音调频率
+            self.frequencies.append(self.pitch)
+
+            if len(self.frequencies) > c.SCREEN_WIDTH:
+                self.frequencies.pop(0)
+            for i, freq in enumerate(self.frequencies):
+                x = i +  self.player.rect.x
+                y = c.SCREEN_HEIGHT - int((freq / 1500) * c.SCREEN_HEIGHT) # 2000Hz 作为频率上限的缩放
+        
+                self.points.append((x, y))
+        
+
         if box:
             self.adjust_player_for_x_collisions(box)
         elif brick:
@@ -387,7 +447,6 @@ class Level(tools.State):
     def adjust_player_for_x_collisions(self, collider):
         if collider.name == c.MAP_SLIDER:
             return
-
         if self.player.rect.x < collider.rect.x:
             self.player.rect.right = collider.rect.left
         else:
@@ -600,6 +659,16 @@ class Level(tools.State):
         self.static_coin_group.draw(self.level)
         self.slider_group.draw(self.level)
         self.pipe_group.draw(self.level)
+
+        self.button_group.draw(self.level)
+        if self.points:
+            fill_points = self.points + [(self.points[-1][0], c.SCREEN_HEIGHT), (self.player.rect.x, c.SCREEN_HEIGHT)]
+            pg.draw.polygon(self.level, c.YELLOW, fill_points)
+
+        # 画出曲线
+        if len(self.points) > 1:
+            pg.draw.lines(self.level, c.ORANGE, False, self.points, 2)
+
         for score in self.moving_score_list:
             score.draw(self.level)
         if c.DEBUG:
@@ -608,3 +677,6 @@ class Level(tools.State):
 
         surface.blit(self.level, (0,0), self.viewport)
         self.overhead_info.draw(surface)
+
+
+        # 填充曲线以下的区域

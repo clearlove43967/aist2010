@@ -31,6 +31,8 @@ GOLD         = (255, 215,   0)
 
 BGCOLOR = WHITE
 
+RATE = 44100
+CHUNK = 1024
 
 SIZE_MULTIPLIER = 2.5
 BRICK_SIZE_MULTIPLIER = 2.69
@@ -71,6 +73,7 @@ PIPE_TYPE_NONE = 0
 PIPE_TYPE_IN = 1                # can go down in the pipe
 PIPE_TYPE_HORIZONTAL = 2        # can go right in the pipe
 MAP_STEP = 'step'
+MAP_BUTTON = 'button'
 MAP_BRICK = 'brick'
 BRICK_NUM = 'brick_num'
 TYPE_NONE = 0
@@ -190,3 +193,7 @@ EXPLODING = 'exploding'
 #IMAGE SHEET
 ENEMY_SHEET = 'smb_enemies_sheet'
 ITEM_SHEET = 'item_objects'
+
+#BUTTON STATES
+PRESS = 'press'
+RELEASE = 'release'
