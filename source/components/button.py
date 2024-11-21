@@ -63,13 +63,8 @@ class Button(pg.sprite.Sprite):
             self.recording = True
 
 
-
-        #if xx  不同类型的按钮效果不同
-
-
     def release(self):
         self.image = self.frames[0]
         if self.recording:
             self.recording = False  # 停止录音
-
 
