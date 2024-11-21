@@ -670,7 +670,7 @@ class Level(tools.State):
         self.points.clear()
         for i, freq in enumerate(self.frequencies):
             x = i + button_x
-            y = c.SCREEN_HEIGHT - int((freq / 1500) * c.SCREEN_HEIGHT) -button_y # 2000Hz 作为频率上限的缩放
+            y = c.SCREEN_HEIGHT - int((freq / 1500) * c.SCREEN_HEIGHT)# 2000Hz 作为频率上限的缩放
             self.points.append((x, y))
         print(self.points)
 
