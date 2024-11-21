@@ -6,25 +6,6 @@ import pyaudio
 from scipy.fftpack import fft
 import time
 
-RATE = 44100  # 采样率
-CHUNK = 1024  # 每次读取的音频块大小
-WHITE = (255, 255, 255)
-LIGHT_BLUE = (173, 216, 230)  # 淡蓝色
-LINE_COLOR = (0, 0, 255)  # 蓝色线条
-p = pyaudio.PyAudio()
-stream = p.open(format=pyaudio.paInt16, channels=1, rate=RATE, input=True, frames_per_buffer=CHUNK)
-
-# 丢弃前几帧数据以稳定麦克风
-for _ in range(5):
-    stream.read(CHUNK)
-
-frequencies = []
-recording = False
-start_time = None  # 开始时间
-
-# 获取音调频率的函数
-
-
 class Button(pg.sprite.Sprite):
     def __init__(self, x, y, type, group=None, name=c.MAP_BUTTON):
         pg.sprite.Sprite.__init__(self)
@@ -59,11 +40,6 @@ class Button(pg.sprite.Sprite):
         self.image = self.frames[1]
         if not self.recording:  # 只有在不录音时才开始录音
             self.recording = True
-
-
-
-        #if xx  不同类型的按钮效果不同
-
 
     def release(self):
         self.image = self.frames[0]
