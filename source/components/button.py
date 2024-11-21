@@ -57,12 +57,6 @@ class Button(pg.sprite.Sprite):
             self.frames.append(tools.get_image(sheet, *frame_rect,
                                                c.COLOR_TYPE_ORANGE, c.BRICK_SIZE_MULTIPLIER))
 
-    def update(self,is_pressed):
-        if is_pressed:
-            self.press()
-        else:
-            self.release()
-
     def press(self):
         self.image = self.frames[1]
         if not self.recording:  # 只有在不录音时才开始录音
