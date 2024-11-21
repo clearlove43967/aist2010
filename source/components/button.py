@@ -3,10 +3,6 @@
 import pygame as pg
 from .. import setup, tools
 from .. import constants as c
-import numpy as np
-import pyaudio
-from scipy.fftpack import fft
-import time
 
 RATE = 44100  # 采样率
 CHUNK = 1024  # 每次读取的音频块大小
@@ -46,9 +42,7 @@ class Button(pg.sprite.Sprite):
         self.group = group
         self.name = name
 
-        self.frequencies = []
-        self.recording = False
-        self.start_time = None  # 开始时间
+        self.start_time = None  # start time
 
     def load_frames(self):
         sheet = setup.GFX['item_objects']
@@ -59,8 +53,8 @@ class Button(pg.sprite.Sprite):
 
     def press(self):
         self.image = self.frames[1]
-        if not self.recording:  # 只有在不录音时才开始录音
-            self.recording = True
+        if not self.is_pressed:
+            self.is_pressed = True
 
 
 
@@ -69,7 +63,7 @@ class Button(pg.sprite.Sprite):
 
     def release(self):
         self.image = self.frames[0]
-        if self.recording:
-            self.recording = False  # 停止录音
+        if self.is_pressed:
+            self.is_pressed = False
 
 
