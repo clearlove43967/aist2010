@@ -1,5 +1,3 @@
-# 大傻福又开始写代码咯^_^
-# 看看他今天能写出什么答辩^_^
 import pygame as pg
 from .. import setup, tools
 from .. import constants as c
