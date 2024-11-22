@@ -16,7 +16,10 @@
         {"x":1629, "y":409, "width": 83, "height":126, "type":0},
         {"x":1972, "y":366, "width": 83, "height":170, "type":0},
         {"x":2444, "y":366, "width": 83, "height":170, "type":1},
-        {"x":6987, "y":451, "width": 83, "height": 84, "type":0},
+        {"x":3107, "y":284, "width": 83, "height":252, "type":0},
+        {"x":4966, "y":409, "width": 83, "height":126, "type":0},
+        {"x":6182, "y":451, "width": 83, "height": 84, "type":0},
+        {"x":6987, "y":409, "width": 83, "height": 126, "type":0},
         {"x":7673, "y":451, "width": 83, "height": 84, "type":0},
         {"x":9724, "y":451, "width": 40, "height": 84, "type":2}
     ],
