@@ -651,8 +651,6 @@ class Level(tools.State):
             self.p.terminate()
         self.recording = False
         self.frequencies = []
-        self.point.trace=[]
-        self.point=None
 
 
     def handle_audio_data(self,button_x, button_y, type):
