@@ -13,6 +13,7 @@ class Point(pygame.sprite.Sprite):
         pygame.draw.circle(self.image, color, (radius, radius), radius)  # 在表面上绘制圆
         self.rect = self.image.get_rect(center=(x, y))  # 设置位置
         self.trace=[]
+        self.fill=True
 
     def update(self, x, y):
         self.rect.x=x
