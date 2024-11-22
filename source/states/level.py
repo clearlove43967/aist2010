@@ -33,6 +33,7 @@ class Level(tools.State):
         self.step_group = self.setup_collide(c.MAP_STEP)
 
         self.setup_buttons()
+        self.setup_scatters()
         self.setup_pipe()
         self.setup_slider()
         self.setup_static_coin()
@@ -60,14 +61,16 @@ class Level(tools.State):
         frame_rect_list=[(0, 143, 15, 15), (0, 64, 16, 16)]
         if c.MAP_BUTTON in self.map_data:
             for data in self.map_data[c.MAP_BUTTON]:
-                self.button_group.add(button.Button(data['x'], data['y'], data['type'],frame_rect_list))
+                self.button_group.add(button.Button(data['x'], data['y'], frame_rect_list, data['type']))
 
     def setup_scatters(self):
         self.scatter_group = pg.sprite.Group()
-        #frame_rect_list = [(0, 143, 15, 15), (0, 64, 16, 16)]
+        frame_rect_list = [(304, 48, 16, 16), (288, 48, 16, 16)]
         if c.MAP_SCATTER in self.map_data:
             for data in self.map_data[c.MAP_SCATTER]:
-                self.scatter_group.add(button.Button(data['x'], data['y'], data['type'], frame_rect_list))
+                scatter=button.Button(data['x'], data['y'], frame_rect_list)
+                scatter.release()
+                self.scatter_group.add(scatter)
 
     def setup_background(self):
         img_name = self.map_data[c.MAP_IMAGE]
@@ -335,13 +338,10 @@ class Level(tools.State):
         shell = pg.sprite.spritecollideany(self.player, self.shell_group)
         powerup = pg.sprite.spritecollideany(self.player, self.powerup_group)
         coin = pg.sprite.spritecollideany(self.player, self.static_coin_group)
-
-
         button =  pg.sprite.spritecollideany(self.player, self.button_group)
+
         if button and not self.recording:
             self.recording_start(button)
-
-
 
         if self.recording and not button:
             self.recording_stop()
@@ -350,8 +350,6 @@ class Level(tools.State):
             x, y = button.rect.x, button.rect.y
             type = button.type
             self.handle_audio_data(x, y, type)
-
-
         
 
         if box:
@@ -630,7 +628,6 @@ class Level(tools.State):
 
     def recording_start(self,button):
         self.recording = True
-        self.points = []
         self.frequencies = []
         self.p = pyaudio.PyAudio()
         self.stream = self.p.open(format=pyaudio.paInt16, channels=1, rate=c.RATE, input=True,
@@ -641,6 +638,8 @@ class Level(tools.State):
         button.press()
 
         self.point = point.Point(button.rect.x,button.rect.y)
+        for scatter in self.scatter_group:
+            scatter.release()
 
     def recording_stop(self):
         for button in self.button_group:
@@ -682,12 +681,17 @@ class Level(tools.State):
             y = c.SCREEN_HEIGHT - int((freq / 1500) * c.SCREEN_HEIGHT)-64# 2000Hz 作为频率上限的缩放
             self.point.update(x,y)
             if type == 1:
-                for idx, (px, py) in enumerate(target_points):
+                self.point.fill=False
+                scatter = pg.sprite.spritecollideany(self.point, self.scatter_group)
+                if scatter:
+                    scatter.press()
+                '''
+                for idx, (px, py) in enumerate(self.scatter_group):
                     if not hit_points[idx]:  # 只检查未击中的点
                         if px - 7 <= x <= px + 7 and abs(py - y) < 7:  # 检查是否穿过点
                             hit_points[idx] = True  # 标记为已击中
                             break
-        
+                '''
 
 
 
@@ -708,9 +712,10 @@ class Level(tools.State):
         self.pipe_group.draw(self.level)
 
         self.button_group.draw(self.level)
+        self.scatter_group.draw(self.level)
 
         if self.point:
-            if self.point.trace:
+            if self.point.trace and self.point.fill:
                 fill_points = self.point.trace + [(self.point.trace[-1][0], c.SCREEN_HEIGHT), (self.point.trace[0][0], c.SCREEN_HEIGHT)]
                 pg.draw.polygon(self.level, c.YELLOW, fill_points)
 
