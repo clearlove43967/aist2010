@@ -47,6 +47,7 @@ class Level(tools.State):
         self.recording = False
         self.frequencies=[]
         self.point = None
+        self.bridge = False
 
 
     def load_map(self):
@@ -633,7 +634,7 @@ class Level(tools.State):
         self.stream = self.p.open(format=pyaudio.paInt16, channels=1, rate=c.RATE, input=True,
                                   frames_per_buffer=c.CHUNK)
         # 丢弃前几帧数据以稳定麦克风
-        for _ in range(5):
+        for _ in range(25):
             self.stream.read(c.CHUNK)
         button.press()
 
