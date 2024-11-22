@@ -197,3 +197,6 @@ ITEM_SHEET = 'item_objects'
 #BUTTON STATES
 PRESS = 'press'
 RELEASE = 'release'
+
+#SCATTER
+MAP_SCATTER = "scatter"

@@ -57,11 +57,17 @@ class Level(tools.State):
 
     def setup_buttons(self):
         self.button_group = pg.sprite.Group()
+        frame_rect_list=[(0, 143, 15, 15), (0, 64, 16, 16)]
         if c.MAP_BUTTON in self.map_data:
             for data in self.map_data[c.MAP_BUTTON]:
-                self.button_group.add(button.Button(data['x'], data['y'], data['type']))
+                self.button_group.add(button.Button(data['x'], data['y'], data['type'],frame_rect_list))
 
-
+    def setup_scatters(self):
+        self.scatter_group = pg.sprite.Group()
+        #frame_rect_list = [(0, 143, 15, 15), (0, 64, 16, 16)]
+        if c.MAP_SCATTER in self.map_data:
+            for data in self.map_data[c.MAP_SCATTER]:
+                self.scatter_group.add(button.Button(data['x'], data['y'], data['type'], frame_rect_list,))
 
     def setup_background(self):
         img_name = self.map_data[c.MAP_IMAGE]
@@ -342,7 +348,8 @@ class Level(tools.State):
 
         if self.recording:
             x, y = button.rect.x, button.rect.y
-            self.handle_audio_data(x, y)
+            type = button.type
+            self.handle_audio_data(x, y, type)
 
 
         
@@ -645,7 +652,7 @@ class Level(tools.State):
         self.frequencies = []
 
 
-    def handle_audio_data(self,button_x,button_y):
+    def handle_audio_data(self,button_x, button_y, type):
         data = np.frombuffer(self.stream.read(c.CHUNK), dtype=np.int16) / 32768.0  # 归一化
         pitch = get_pitch(data)  # 获取当前音调频率
         self.frequencies.append(pitch)
@@ -672,6 +679,12 @@ class Level(tools.State):
             x = i + button_x
             y = c.SCREEN_HEIGHT - int((freq / 1500) * c.SCREEN_HEIGHT)# 2000Hz 作为频率上限的缩放
             self.points.append((x, y))
+            if type == 1:
+                for idx, (px, py) in enumerate(target_points):
+                    if not hit_points[idx]:  # 只检查未击中的点
+                        if px - 7 <= x <= px + 7 and abs(py - y) < 7:  # 检查是否穿过点
+                            hit_points[idx] = True  # 标记为已击中
+                            break
         print(self.points)
 
 
