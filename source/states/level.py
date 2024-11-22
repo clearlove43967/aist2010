@@ -8,7 +8,7 @@ import numpy as np
 import pygame as pg
 from .. import setup, tools
 from .. import constants as c
-from ..components import info, stuff, player, brick, box, enemy, powerup, coin, button
+from ..components import info, stuff, player, brick, box, enemy, powerup, coin, button, point
 
 
 class Level(tools.State):
@@ -44,8 +44,8 @@ class Level(tools.State):
         self.setup_sprite_groups()
 
         self.recording = False
-        self.points=[]
         self.frequencies=[]
+        self.point = None
 
 
     def load_map(self):
@@ -67,7 +67,7 @@ class Level(tools.State):
         #frame_rect_list = [(0, 143, 15, 15), (0, 64, 16, 16)]
         if c.MAP_SCATTER in self.map_data:
             for data in self.map_data[c.MAP_SCATTER]:
-                self.scatter_group.add(button.Button(data['x'], data['y'], data['type'], frame_rect_list,))
+                self.scatter_group.add(button.Button(data['x'], data['y'], data['type'], frame_rect_list))
 
     def setup_background(self):
         img_name = self.map_data[c.MAP_IMAGE]
@@ -640,6 +640,8 @@ class Level(tools.State):
             self.stream.read(c.CHUNK)
         button.press()
 
+        self.point = point.Point(button.rect.x,button.rect.y)
+
     def recording_stop(self):
         for button in self.button_group:
             button.release()
@@ -648,8 +650,9 @@ class Level(tools.State):
             self.stream.close()  # 关闭音频流
             self.p.terminate()
         self.recording = False
-        self.points = []
         self.frequencies = []
+        self.point.trace=[]
+        self.point=None
 
 
     def handle_audio_data(self,button_x, button_y, type):
@@ -673,19 +676,19 @@ class Level(tools.State):
 
         if len(self.frequencies) > c.SCREEN_WIDTH:
             self.frequencies.pop(0)
-
-        self.points.clear()
+        self.point.trace.clear()
         for i, freq in enumerate(self.frequencies):
             x = i + button_x
-            y = c.SCREEN_HEIGHT - int((freq / 1500) * c.SCREEN_HEIGHT)# 2000Hz 作为频率上限的缩放
-            self.points.append((x, y))
+            y = c.SCREEN_HEIGHT - int((freq / 1500) * c.SCREEN_HEIGHT)-64# 2000Hz 作为频率上限的缩放
+            self.point.update(x,y)
             if type == 1:
                 for idx, (px, py) in enumerate(target_points):
                     if not hit_points[idx]:  # 只检查未击中的点
                         if px - 7 <= x <= px + 7 and abs(py - y) < 7:  # 检查是否穿过点
                             hit_points[idx] = True  # 标记为已击中
                             break
-        print(self.points)
+        
+
 
 
     def draw(self, surface):
@@ -706,15 +709,15 @@ class Level(tools.State):
 
         self.button_group.draw(self.level)
 
+        if self.point:
+            if self.point.trace:
+                fill_points = self.point.trace + [(self.point.trace[-1][0], c.SCREEN_HEIGHT), (self.point.trace[0][0], c.SCREEN_HEIGHT)]
+                pg.draw.polygon(self.level, c.YELLOW, fill_points)
 
-
-        if self.points:
-            fill_points = self.points + [(self.points[-1][0], c.SCREEN_HEIGHT), (self.player.rect.x, c.SCREEN_HEIGHT)]
-            pg.draw.polygon(self.level, c.YELLOW, fill_points)
-
-        # 画出曲线
-        if len(self.points) > 1:
-            pg.draw.lines(self.level, c.ORANGE, False, self.points, 2)
+            # 画出曲线
+            if len(self.point.trace) > 1:
+                pg.draw.lines(self.level, c.ORANGE, False, self.point.trace, 2)
+            self.point.draw_point(self.level)
 
         for score in self.moving_score_list:
             score.draw(self.level)
