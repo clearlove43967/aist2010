@@ -4,6 +4,7 @@ import pygame as pg
 from .. import setup, tools
 from .. import constants as c
 from . import stuff
+from . import enemy as enemy_type
 
 
 class Powerup(stuff.Stuff):
@@ -173,6 +174,7 @@ class FireBall(Powerup):
         # first 3 Frames are flying, last 4 frames are exploding
         print("pitch is " + pitch)
         self.fireball_type = pitch
+        self.color = pitch
         if pitch == c.DO:
             frame_rect_list = [(255, 191, 9, 9), (263, 191, 9, 9),
                                (255, 199, 9, 9), (263, 199, 9, 9),
@@ -272,7 +274,15 @@ class FireBall(Powerup):
                     self.x_vel = -15
                 self.state = c.BOUNCING
         elif enemy:
-            if (enemy.name != c.FIRESTICK):
+            if isinstance(enemy, enemy_type.Goomba):  # 确认 enemy 是 Goomba 的实例
+                print(f"Goomba color: {enemy.goomba_color}")
+                print(self.color)
+                if self.color == enemy.goomba_color:
+                    enemy.start_death_jump(self.direction)
+                    self.change_to_explode()
+                else:
+                    pass
+            elif (enemy.name != c.FIRESTICK):
                 level.update_score(100, enemy, 0)
                 level.move_to_dying_group(level.enemy_group, enemy)
                 enemy.start_death_jump(self.direction)

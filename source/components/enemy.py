@@ -238,6 +238,7 @@ class Goomba(Enemy):
                  range_start, range_end, name=c.GOOMBA):
         Enemy.__init__(self)
         frame_rect_list = self.get_frame_rect(goomba_color)
+        self.goomba_color = goomba_color
         self.setup_enemy(x, y, direction, name, setup.GFX[c.GOOMBA_SHEET],
                          frame_rect_list, in_range, range_start, range_end)
         # dead jump image
