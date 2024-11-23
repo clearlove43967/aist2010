@@ -681,9 +681,6 @@ class Level(tools.State):
         self.bridge_points.clear()  # 清空桥点
         self.update_bridge([])  # 重新初始化桥的碰撞体积为空
 
-        for scatter in self.scatter_group:
-            scatter.release()
-
     def recording_stop(self):
         for button in self.button_group:
             button.release()
@@ -775,7 +772,6 @@ class Level(tools.State):
             box_rect = pg.Rect(message_x,message_y, 400, 200)
             pg.draw.rect(self.level, c.GRAY, box_rect)
             pg.draw.rect(self.level, c.BLACK, box_rect, 3)
-            text = font.render("fuck you sb", True, c.RED)
 
         self.button_group.draw(self.level)
         for group in self.scatter_group_list:
