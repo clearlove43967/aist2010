@@ -1,5 +1,4 @@
 import pygame as pg
-from .. import constants as c
 
 class Bridge(pg.sprite.Sprite):
     def __init__(self, points):
@@ -10,7 +9,7 @@ class Bridge(pg.sprite.Sprite):
 
     def create_segments(self):
         """Create rectangular segments for each point pair to represent the bridge."""
-        for i in range(len(self.points) - 1):
+        for i in range(0, len(self.points) - 1, 1):
             x1, y1 = self.points[i]
             x2, y2 = self.points[i + 1]
             width = abs(x2 - x1)
@@ -19,14 +18,18 @@ class Bridge(pg.sprite.Sprite):
             self.segments.append(rect)
 
     def update_points(self, new_points):
-        """Update bridge points and recreate segments."""
+        """Update bridge points and recreate segments only if necessary."""
+        if self.points == new_points:
+            return  # Skip updates if points are unchanged
         self.points = new_points
         self.segments.clear()
         self.create_segments()
 
     def check_collision(self, player):
-        """Check if the player collides with any segment."""
+        """Efficiently check if the player collides with any relevant segment."""
+        player_rect = player.rect
         for segment in self.segments:
-            if player.rect.colliderect(segment):
+            if player_rect.colliderect(segment):
                 return segment
         return None
+
