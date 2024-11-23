@@ -1,5 +1,5 @@
 __author__ = 'marble_xu'
-
+import time
 import os
 import json
 import pyaudio
@@ -8,9 +8,10 @@ import numpy as np
 import pygame as pg
 from .. import setup, tools
 from .. import constants as c
-from ..components import info, stuff, player, brick, box, enemy, powerup, coin, button, point
+from ..components import info, stuff, player, brick, box, enemy, powerup, coin, button, point,bridge
 
-font = pg.font.Font(None, 36)
+
+
 class Level(tools.State):
     def __init__(self):
         tools.State.__init__(self)
@@ -48,6 +49,9 @@ class Level(tools.State):
         self.gen_flag = False
         self.frequencies=[]
         self.point = None
+        self.bridge_points = []  # Initial empty list for bridge points
+        self.bridge = bridge.Bridge(self.bridge_points)
+        self.bridge_group = pg.sprite.Group(self.bridge)
 
 
     def load_map(self):
@@ -271,7 +275,7 @@ class Level(tools.State):
             self.overhead_info.update(self.game_info, self.player)
             for score in self.moving_score_list:
                 score.update(self.moving_score_list)
-    
+
     def check_checkpoints(self):
         checkpoint = pg.sprite.spritecollideany(self.player, self.checkpoint_group)
         
@@ -342,7 +346,13 @@ class Level(tools.State):
         if not self.player.dead:
             self.player.rect.y += round(self.player.y_vel)
             self.check_player_y_collisions()
-    
+
+    def update_bridge(self, new_points):
+        if not new_points:
+            self.bridge_group.empty()  # 移除所有桥段
+        else:
+            self.bridge.update_points(new_points)
+
     def check_player_x_collisions(self):
         ground_step_pipe = pg.sprite.spritecollideany(self.player, self.ground_step_pipe_group)
         brick = pg.sprite.spritecollideany(self.player, self.brick_group)
@@ -363,7 +373,11 @@ class Level(tools.State):
         if self.recording and not self.player.message:
             x, y = button.rect.x, button.rect.y
             type = button.type
-            self.handle_audio_data(x, y, type)
+            # cannon
+            if button.type == 2:
+                self.cannon_audio(button, self.powerup_group)
+            else:
+                self.handle_audio_data(x, y, type)
         
 
         if box:
@@ -451,6 +465,7 @@ class Level(tools.State):
 
     def check_player_y_collisions(self):
         ground_step_pipe = pg.sprite.spritecollideany(self.player, self.ground_step_pipe_group)
+        bridge_segment = self.bridge.check_collision(self.player)
         enemy = pg.sprite.spritecollideany(self.player, self.enemy_group)
         shell = pg.sprite.spritecollideany(self.player, self.shell_group)
 
@@ -461,6 +476,12 @@ class Level(tools.State):
             brick, box = self.prevent_collision_conflict(brick, box)
         else:
             brick, box = False, False
+
+        if bridge_segment:
+            # Adjust player position for the bridge
+            self.player.rect.bottom = bridge_segment.top
+            self.player.y_vel = 0
+            self.player.state = c.WALK
 
         if box:
             self.adjust_player_for_y_collisions(box)
@@ -547,7 +568,8 @@ class Level(tools.State):
                 self.player.state = c.WALK_AUTO
             else:
                 self.player.state = c.WALK
-    
+
+
     def check_if_enemy_on_brick_box(self, brick):
         brick.rect.y -= 5
         enemy = pg.sprite.spritecollideany(brick, self.enemy_group)
@@ -640,7 +662,7 @@ class Level(tools.State):
         y = sprite.rect.y - 10
         self.moving_score_list.append(stuff.Score(x, y, score))
 
-    def recording_start(self,button):
+    def recording_start(self, button):
         self.recording = True
         self.gen_flag = False
         self.frequencies = []
@@ -648,7 +670,7 @@ class Level(tools.State):
         self.stream = self.p.open(format=pyaudio.paInt16, channels=1, rate=c.RATE, input=True,
                                   frames_per_buffer=c.CHUNK)
         # 丢弃前几帧数据以稳定麦克风
-        for _ in range(5):
+        for _ in range(25):
             self.stream.read(c.CHUNK)
         button.press()
 
@@ -656,6 +678,11 @@ class Level(tools.State):
         for group in self.scatter_group_list:
             for scatter in group:
                 scatter.release()
+        self.bridge_points.clear()  # 清空桥点
+        self.update_bridge([])  # 重新初始化桥的碰撞体积为空
+
+        for scatter in self.scatter_group:
+            scatter.release()
 
     def recording_stop(self):
         for button in self.button_group:
@@ -691,9 +718,16 @@ class Level(tools.State):
             self.frequencies.pop(0)
         self.point.trace.clear()
         for i, freq in enumerate(self.frequencies):
-            x = i + button_x
+            x = i + button_x + 50
             y = c.SCREEN_HEIGHT - int((freq / 1500) * c.SCREEN_HEIGHT)-64# 2000Hz 作为频率上限的缩放
-            self.point.update(x,y)
+            self.point.update(x, y)
+            if type == 0:
+                self.point.fill = True
+                if len(self.point.trace) > self.player_x:
+                    for i in range(len(self.point.trace)):
+                        # Pass the updated points to update_bridge
+                        self.update_bridge(self.point.trace)
+
             if type == 1:
                 scatter=None
                 self.point.fill=False
@@ -710,7 +744,14 @@ class Level(tools.State):
 
 
 
-
+    def cannon_audio(self, button, powerup_group):
+        data = np.frombuffer(self.stream.read(c.CHUNK), dtype=np.int16) / 32768.0  # 归一化
+        freq = get_pitch(data)
+        detected_pitch = check_frequency_match(freq)
+        print(detected_pitch)
+        if detected_pitch:
+            button.shoot_bullet(detected_pitch, powerup_group)
+        return
 
     def draw(self, surface):
         self.level.blit(self.background, self.viewport, self.viewport)
@@ -770,3 +811,45 @@ def get_pitch(data):
     peak_freq = abs(freqs[peak_idx])
 
     return peak_freq
+
+
+def get_frequency(self, data, rate):
+    """calculate frequency"""
+    n = len(data)
+    # Hanning window to decrease leakage
+    window = np.hanning(n)
+    data = data * window
+    fft = np.fft.rfft(data)
+    frequencies = np.fft.rfftfreq(n, 1 / rate)
+    magnitude = np.abs(fft)
+    # get the freq with maximum magnitude
+    peak_index = np.argmax(magnitude)
+    return frequencies[peak_index]
+
+
+def check_frequency_match(freq):
+    """
+    using microphone to get freq
+    target_frequency
+    tolerance: error range
+    """
+    frequency_dict = {
+        261.6: 'do',
+        293.6: 're',
+        329.6: 'mi',
+        349.2: 'fa',
+        392: 'sol',
+        440: 'la',
+        493.8: 'ti'
+    }
+    # init pyaudio
+    detected_pitch = None
+    for pitch in frequency_dict.keys():
+        if pitch - c.TOLERANCE <= freq <= pitch + c.TOLERANCE:
+            print(f"detect target freq {freq:.2f} Hz，Done！")
+            detected_pitch = pitch
+            break
+    if detected_pitch:
+        return frequency_dict[detected_pitch]
+    else:
+        return None
