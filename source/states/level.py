@@ -1,5 +1,5 @@
 __author__ = 'marble_xu'
-
+import time
 import os
 import json
 import pyaudio
@@ -9,6 +9,7 @@ import pygame as pg
 from .. import setup, tools
 from .. import constants as c
 from ..components import info, stuff, player, brick, box, enemy, powerup, coin, button, point,bridge
+
 
 
 class Level(tools.State):
@@ -358,7 +359,11 @@ class Level(tools.State):
         if self.recording:
             x, y = button.rect.x, button.rect.y
             type = button.type
-            self.handle_audio_data(x, y, type)
+            # cannon
+            if button.type == 2:
+                self.cannon_audio(button, self.powerup_group)
+            else:
+                self.handle_audio_data(x, y, type)
         
 
         if box:
@@ -643,7 +648,7 @@ class Level(tools.State):
         y = sprite.rect.y - 10
         self.moving_score_list.append(stuff.Score(x, y, score))
 
-    def recording_start(self,button):
+    def recording_start(self, button):
         self.recording = True
         self.frequencies = []
         self.p = pyaudio.PyAudio()
@@ -697,7 +702,7 @@ class Level(tools.State):
         for i, freq in enumerate(self.frequencies):
             x = i + button_x + 50
             y = c.SCREEN_HEIGHT - int((freq / 1500) * c.SCREEN_HEIGHT)-64# 2000Hz 作为频率上限的缩放
-            self.point.update(x,y)
+            self.point.update(x, y)
             if type == 0:
                 self.point.fill = True
                 if len(self.point.trace) > self.player_x:
@@ -711,7 +716,14 @@ class Level(tools.State):
                 if scatter:
                     scatter.press()
 
-
+    def cannon_audio(self, button, powerup_group):
+        data = np.frombuffer(self.stream.read(c.CHUNK), dtype=np.int16) / 32768.0  # 归一化
+        freq = get_pitch(data)
+        detected_pitch = check_frequency_match(freq)
+        print(detected_pitch)
+        if detected_pitch:
+            button.shoot_bullet(detected_pitch, powerup_group)
+        return
 
     def draw(self, surface):
         self.level.blit(self.background, self.viewport, self.viewport)
@@ -762,3 +774,45 @@ def get_pitch(data):
     peak_freq = abs(freqs[peak_idx])
 
     return peak_freq
+
+
+def get_frequency(self, data, rate):
+    """calculate frequency"""
+    n = len(data)
+    # Hanning window to decrease leakage
+    window = np.hanning(n)
+    data = data * window
+    fft = np.fft.rfft(data)
+    frequencies = np.fft.rfftfreq(n, 1 / rate)
+    magnitude = np.abs(fft)
+    # get the freq with maximum magnitude
+    peak_index = np.argmax(magnitude)
+    return frequencies[peak_index]
+
+
+def check_frequency_match(freq):
+    """
+    using microphone to get freq
+    target_frequency
+    tolerance: error range
+    """
+    frequency_dict = {
+        261.6: 'do',
+        293.6: 're',
+        329.6: 'mi',
+        349.2: 'fa',
+        392: 'sol',
+        440: 'la',
+        493.8: 'ti'
+    }
+    # init pyaudio
+    detected_pitch = None
+    for pitch in frequency_dict.keys():
+        if pitch - c.TOLERANCE <= freq <= pitch + c.TOLERANCE:
+            print(f"detect target freq {freq:.2f} Hz，Done！")
+            detected_pitch = pitch
+            break
+    if detected_pitch:
+        return frequency_dict[detected_pitch]
+    else:
+        return None
