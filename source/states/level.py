@@ -46,10 +46,12 @@ class Level(tools.State):
         self.setup_sprite_groups()
 
         self.recording = False
+        self.gen_flag = False
         self.frequencies=[]
         self.point = None
         self.bridge_points = []  # Initial empty list for bridge points
         self.bridge = bridge.Bridge(self.bridge_points)
+        self.bridge_group = pg.sprite.Group(self.bridge)
 
 
     def load_map(self):
@@ -67,13 +69,17 @@ class Level(tools.State):
                 self.button_group.add(button.Button(data['x'], data['y'], frame_rect_list, data['type']))
 
     def setup_scatters(self):
-        self.scatter_group = pg.sprite.Group()
+        self.scatter_group_list = []
         frame_rect_list = [(304, 48, 16, 16), (288, 48, 16, 16)]
-        if c.MAP_SCATTER in self.map_data:
-            for data in self.map_data[c.MAP_SCATTER]:
-                scatter=button.Button(data['x'], data['y'], frame_rect_list)
+        index = 0
+        for data in self.map_data[c.MAP_SCATTER]:
+            group = pg.sprite.Group()
+            for item in data[str(index)]:
+                scatter = button.Button(item['x'], item['y'], frame_rect_list,group=index)
                 scatter.release()
-                self.scatter_group.add(scatter)
+                group.add(scatter)
+            self.scatter_group_list.append(group)
+            index += 1
 
     def setup_background(self):
         img_name = self.map_data[c.MAP_IMAGE]
@@ -307,6 +313,14 @@ class Level(tools.State):
                 self.player.state = c.WALK_AUTO
             checkpoint.kill()
 
+    def check_press_number(self):
+        num=0
+        for group in self.scatter_group_list:
+            for scatter in group:
+                if scatter.is_pressed:
+                    num+=1
+        return num
+
     def update_flag_score(self):
         base_y = c.GROUND_HEIGHT - 80
         
@@ -347,12 +361,13 @@ class Level(tools.State):
         button =  pg.sprite.spritecollideany(self.player, self.button_group)
 
         if button and not self.recording:
+            self.player.message=True
             self.recording_start(button)
 
         if self.recording and not button:
             self.recording_stop()
 
-        if self.recording:
+        if self.recording and not self.player.message:
             x, y = button.rect.x, button.rect.y
             type = button.type
             # cannon
@@ -648,6 +663,7 @@ class Level(tools.State):
 
     def recording_start(self, button):
         self.recording = True
+        self.gen_flag = False
         self.frequencies = []
         self.p = pyaudio.PyAudio()
         self.stream = self.p.open(format=pyaudio.paInt16, channels=1, rate=c.RATE, input=True,
@@ -660,10 +676,11 @@ class Level(tools.State):
         self.bridge_points = []
 
         self.bridge = bridge.Bridge(self.bridge_points)
-        self.point = point.Point(button.rect.x, button.rect.y)
 
-        for scatter in self.scatter_group:
-            scatter.release()
+        self.point = point.Point(button.rect.x, button.rect.y)
+        for group in self.scatter_group_list:
+            for scatter in group:
+                scatter.release()
 
     def recording_stop(self):
         for button in self.button_group:
@@ -715,10 +732,20 @@ class Level(tools.State):
                     self.update_bridge(self.bridge_points)
 
             if type == 1:
-                self.point.fill = False
-                scatter = pg.sprite.spritecollideany(self.point, self.scatter_group)
-                if scatter:
-                    scatter.press()
+                scatter=None
+                self.point.fill=False
+                for group in self.scatter_group_list:
+                    scatter = pg.sprite.spritecollideany(self.point, group)
+                    if scatter:
+                        scatter.press()
+                        group_idx=scatter.group
+                        num=self.check_press_number()
+                        if num%4==0 and not self.gen_flag:
+                            self.gen_flag=True
+                            for data in self.map_data[c.MAP_NEWBRICK][group_idx][str(group_idx)]:
+                                brick.create_brick(self.brick_group, data, self)
+
+
 
     def cannon_audio(self, button, powerup_group):
         data = np.frombuffer(self.stream.read(c.CHUNK), dtype=np.int16) / 32768.0  # 归一化
@@ -745,8 +772,16 @@ class Level(tools.State):
         self.slider_group.draw(self.level)
         self.pipe_group.draw(self.level)
 
+        if self.player.message:
+            message_x=self.player.rect.x+200
+            message_y=self.player.rect.y-200
+            box_rect = pg.Rect(message_x,message_y, 400, 200)
+            pg.draw.rect(self.level, c.GRAY, box_rect)
+            pg.draw.rect(self.level, c.BLACK, box_rect, 3)
+
         self.button_group.draw(self.level)
-        self.scatter_group.draw(self.level)
+        for group in self.scatter_group_list:
+            group.draw(self.level)
 
         if self.point:
             if self.point.trace and self.point.fill:

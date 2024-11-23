@@ -31,7 +31,7 @@ GOLD         = (255, 215,   0)
 
 BGCOLOR = WHITE
 
-RATE = 22050
+RATE = 44100
 CHUNK = 1024
 
 SIZE_MULTIPLIER = 2.5
@@ -198,8 +198,9 @@ ITEM_SHEET = 'item_objects'
 PRESS = 'press'
 RELEASE = 'release'
 
-#SCATTER
+#SCATTER AND NEW BRICK
 MAP_SCATTER = "scatter"
+MAP_NEWBRICK ="newbrick"
 
 #=================================
 ITEM_SHEET2 = 'item_objects(1)'

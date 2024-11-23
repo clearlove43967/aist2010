@@ -141,17 +141,21 @@
             {"x":1120, "y":538, "direction":0, "type":0, "goomba_color":"do"}
         ]},
         {"1":[
+
             {"x":1920, "y":538, "direction":0, "type":0, "goomba_color":"re"}
         ]},
         {"2":[
+
             {"x":2320, "y":538, "direction":0, "type":0, "goomba_color":"mi"},
             {"x":2380, "y":538, "direction":0, "type":0, "goomba_color":"fa"}
         ]},
         {"3":[
+
             {"x":3640, "y":193, "direction":0, "type":0, "goomba_color":"sol"},
             {"x":3700, "y":193, "direction":0, "type":0, "goomba_color":"sol"}
         ]},
         {"4":[
+
             {"x":4270, "y":538, "direction":0, "type":0, "goomba_color":"ti"},
             {"x":4330, "y":538, "direction":0, "type":0, "goomba_color":"ti"}
         ]},
@@ -212,10 +216,25 @@
         {"x":800, "y":487, "type":2}
     ],
     "scatter": [
-        {"x":1350, "y":387},
-        {"x":1390, "y":287},
-        {"x":1440, "y":427},
-        {"x":1520, "y":417}
-    ]
+        {"0":[
+            {"x":1350, "y":387},
+            {"x":1390, "y":287},
+            {"x":1440, "y":427},
+            {"x":1520, "y":417}
+        ]},
+        {"1":[
 
+        ]}
+    ],
+    "newbrick": [
+        {"0":[
+            {"x":1350, "y":477, "type":0},
+            {"x":1390, "y":477, "type":0},
+            {"x":1440, "y":477, "type":0},
+            {"x":1520, "y":477, "type":0}
+        ]},
+        {"1":[
+
+        ]}
+    ]
 }
