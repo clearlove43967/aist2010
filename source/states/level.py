@@ -49,7 +49,6 @@ class Level(tools.State):
         self.point = None
         self.bridge_points = []  # Initial empty list for bridge points
         self.bridge = bridge.Bridge(self.bridge_points)
-        self.bridge_group = pg.sprite.Group(self.bridge)
 
 
     def load_map(self):
@@ -334,10 +333,7 @@ class Level(tools.State):
             self.check_player_y_collisions()
 
     def update_bridge(self, new_points):
-        if not new_points:
-            self.bridge_group.empty()  # 移除所有桥段
-        else:
-            self.bridge.update_points(new_points)
+        self.bridge.update_points(new_points)
 
     def check_player_x_collisions(self):
         ground_step_pipe = pg.sprite.spritecollideany(self.player, self.ground_step_pipe_group)
@@ -654,8 +650,9 @@ class Level(tools.State):
             self.stream.read(c.CHUNK)
         button.press()
 
-        self.bridge_points.clear()  # 清空桥点
-        self.update_bridge([])  # 重新初始化桥的碰撞体积为空
+        self.bridge_points = []
+
+        self.bridge = bridge.Bridge(self.bridge_points)
         self.point = point.Point(button.rect.x, button.rect.y)
 
         for scatter in self.scatter_group:
@@ -670,6 +667,7 @@ class Level(tools.State):
             self.p.terminate()
         self.recording = False
         self.frequencies = []
+        self.bridge_points = []
 
 
     def handle_audio_data(self,button_x, button_y, type):
