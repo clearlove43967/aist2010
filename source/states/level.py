@@ -8,7 +8,7 @@ import numpy as np
 import pygame as pg
 from .. import setup, tools
 from .. import constants as c
-from ..components import info, stuff, player, brick, box, enemy, powerup, coin, button, point
+from ..components import info, stuff, player, brick, box, enemy, powerup, coin, button, point,bridge
 
 
 class Level(tools.State):
@@ -47,7 +47,9 @@ class Level(tools.State):
         self.recording = False
         self.frequencies=[]
         self.point = None
-        self.bridge = False
+        self.bridge_points = []  # Initial empty list for bridge points
+        self.bridge = bridge.Bridge(self.bridge_points)
+        self.bridge_group = pg.sprite.Group(self.bridge)
 
 
     def load_map(self):
@@ -267,7 +269,7 @@ class Level(tools.State):
             self.overhead_info.update(self.game_info, self.player)
             for score in self.moving_score_list:
                 score.update(self.moving_score_list)
-    
+
     def check_checkpoints(self):
         checkpoint = pg.sprite.spritecollideany(self.player, self.checkpoint_group)
         
@@ -330,7 +332,13 @@ class Level(tools.State):
         if not self.player.dead:
             self.player.rect.y += round(self.player.y_vel)
             self.check_player_y_collisions()
-    
+
+    def update_bridge(self, new_points):
+        if not new_points:
+            self.bridge_group.empty()  # 移除所有桥段
+        else:
+            self.bridge.update_points(new_points)
+
     def check_player_x_collisions(self):
         ground_step_pipe = pg.sprite.spritecollideany(self.player, self.ground_step_pipe_group)
         brick = pg.sprite.spritecollideany(self.player, self.brick_group)
@@ -438,6 +446,7 @@ class Level(tools.State):
 
     def check_player_y_collisions(self):
         ground_step_pipe = pg.sprite.spritecollideany(self.player, self.ground_step_pipe_group)
+        bridge_segment = self.bridge.check_collision(self.player)
         enemy = pg.sprite.spritecollideany(self.player, self.enemy_group)
         shell = pg.sprite.spritecollideany(self.player, self.shell_group)
 
@@ -448,6 +457,12 @@ class Level(tools.State):
             brick, box = self.prevent_collision_conflict(brick, box)
         else:
             brick, box = False, False
+
+        if bridge_segment:
+            # Adjust player position for the bridge
+            self.player.rect.bottom = bridge_segment.top
+            self.player.y_vel = 0
+            self.player.state = c.WALK
 
         if box:
             self.adjust_player_for_y_collisions(box)
@@ -534,6 +549,7 @@ class Level(tools.State):
                 self.player.state = c.WALK_AUTO
             else:
                 self.player.state = c.WALK
+
     
     def check_if_enemy_on_brick_box(self, brick):
         brick.rect.y -= 5
@@ -638,7 +654,10 @@ class Level(tools.State):
             self.stream.read(c.CHUNK)
         button.press()
 
-        self.point = point.Point(button.rect.x,button.rect.y)
+        self.bridge_points.clear()  # 清空桥点
+        self.update_bridge([])  # 重新初始化桥的碰撞体积为空
+        self.point = point.Point(button.rect.x, button.rect.y)
+
         for scatter in self.scatter_group:
             scatter.release()
 
@@ -676,21 +695,21 @@ class Level(tools.State):
             self.frequencies.pop(0)
         self.point.trace.clear()
         for i, freq in enumerate(self.frequencies):
-            x = i + button_x
+            x = i + button_x + 50
             y = c.SCREEN_HEIGHT - int((freq / 1500) * c.SCREEN_HEIGHT)-64# 2000Hz 作为频率上限的缩放
             self.point.update(x,y)
+            if type == 0:
+                self.point.fill = True
+                if len(self.point.trace) > self.player_x:
+                    for i in range(len(self.point.trace)):
+                        # Pass the updated points to update_bridge
+                        self.update_bridge(self.point.trace)
+
             if type == 1:
-                self.point.fill=False
+                self.point.fill = False
                 scatter = pg.sprite.spritecollideany(self.point, self.scatter_group)
                 if scatter:
                     scatter.press()
-                '''
-                for idx, (px, py) in enumerate(self.scatter_group):
-                    if not hit_points[idx]:  # 只检查未击中的点
-                        if px - 7 <= x <= px + 7 and abs(py - y) < 7:  # 检查是否穿过点
-                            hit_points[idx] = True  # 标记为已击中
-                            break
-                '''
 
 
 
