@@ -20,6 +20,7 @@ class Player(pg.sprite.Sprite):
         self.setup_state()
         self.setup_speed()
         self.load_images()
+        self.message=False
 
 
 
@@ -189,10 +190,15 @@ class Player(pg.sprite.Sprite):
             self.allow_fireball = True
             # print(self.allow_fireball)
 
+    def check_to_close_mesaage_box(self,keys):
+        if keys[tools.keybinding["close"]]:
+            print("fuck")
+            self.message=False
+
     def standing(self, keys, fire_group):
         self.check_to_allow_jump(keys)
         self.check_to_allow_fireball(keys)
-
+        self.check_to_close_mesaage_box(keys)
         self.frame_index = 0
         self.x_vel = 0
         self.y_vel = 0

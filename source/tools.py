@@ -10,7 +10,8 @@ keybinding = {
     'left':pg.K_a,
     'right':pg.K_d,
     'down':pg.K_s,
-    'sing':pg.K_k
+    'sing':pg.K_k,
+    'close':pg.K_SPACE
 }
 
 class State():

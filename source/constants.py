@@ -198,5 +198,6 @@ ITEM_SHEET = 'item_objects'
 PRESS = 'press'
 RELEASE = 'release'
 
-#SCATTER
+#SCATTER AND NEW BRICK
 MAP_SCATTER = "scatter"
+MAP_NEWBRICK ="newbrick"

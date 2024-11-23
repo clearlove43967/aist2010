@@ -3,7 +3,7 @@ from .. import setup, tools
 from .. import constants as c
 
 class Button(pg.sprite.Sprite):
-    def __init__(self, x, y, frame_rect_list, type=None,  scatter=None, name=c.MAP_BUTTON):
+    def __init__(self, x, y, frame_rect_list, type=None,  group=None, name=c.MAP_BUTTON):
         pg.sprite.Sprite.__init__(self)
 
         self.frames = []
@@ -16,7 +16,7 @@ class Button(pg.sprite.Sprite):
         self.rect.y = y
         #self.animation_timer = 0
         self.type = type
-        self.scatters=scatter
+        self.group = group
         self.name = name
 
 

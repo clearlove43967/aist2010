@@ -5,7 +5,7 @@ from .. import constants as c
 import pygame
 
 class Point(pygame.sprite.Sprite):
-    def __init__(self, x, y, radius=6, color=(255, 0, 0)):
+    def __init__(self, x, y, radius=3, color=(255, 0, 0)):
         super().__init__()
         self.radius = radius
         self.color = color

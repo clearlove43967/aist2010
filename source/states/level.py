@@ -10,7 +10,7 @@ from .. import setup, tools
 from .. import constants as c
 from ..components import info, stuff, player, brick, box, enemy, powerup, coin, button, point
 
-
+font = pg.font.Font(None, 36)
 class Level(tools.State):
     def __init__(self):
         tools.State.__init__(self)
@@ -45,6 +45,7 @@ class Level(tools.State):
         self.setup_sprite_groups()
 
         self.recording = False
+        self.gen_flag = False
         self.frequencies=[]
         self.point = None
 
@@ -64,13 +65,17 @@ class Level(tools.State):
                 self.button_group.add(button.Button(data['x'], data['y'], frame_rect_list, data['type']))
 
     def setup_scatters(self):
-        self.scatter_group = pg.sprite.Group()
+        self.scatter_group_list = []
         frame_rect_list = [(304, 48, 16, 16), (288, 48, 16, 16)]
-        if c.MAP_SCATTER in self.map_data:
-            for data in self.map_data[c.MAP_SCATTER]:
-                scatter=button.Button(data['x'], data['y'], frame_rect_list)
+        index = 0
+        for data in self.map_data[c.MAP_SCATTER]:
+            group = pg.sprite.Group()
+            for item in data[str(index)]:
+                scatter = button.Button(item['x'], item['y'], frame_rect_list,group=index)
                 scatter.release()
-                self.scatter_group.add(scatter)
+                group.add(scatter)
+            self.scatter_group_list.append(group)
+            index += 1
 
     def setup_background(self):
         img_name = self.map_data[c.MAP_IMAGE]
@@ -304,6 +309,14 @@ class Level(tools.State):
                 self.player.state = c.WALK_AUTO
             checkpoint.kill()
 
+    def check_press_number(self):
+        num=0
+        for group in self.scatter_group_list:
+            for scatter in group:
+                if scatter.is_pressed:
+                    num+=1
+        return num
+
     def update_flag_score(self):
         base_y = c.GROUND_HEIGHT - 80
         
@@ -341,12 +354,13 @@ class Level(tools.State):
         button =  pg.sprite.spritecollideany(self.player, self.button_group)
 
         if button and not self.recording:
+            self.player.message=True
             self.recording_start(button)
 
         if self.recording and not button:
             self.recording_stop()
 
-        if self.recording:
+        if self.recording and not self.player.message:
             x, y = button.rect.x, button.rect.y
             type = button.type
             self.handle_audio_data(x, y, type)
@@ -628,6 +642,7 @@ class Level(tools.State):
 
     def recording_start(self,button):
         self.recording = True
+        self.gen_flag = False
         self.frequencies = []
         self.p = pyaudio.PyAudio()
         self.stream = self.p.open(format=pyaudio.paInt16, channels=1, rate=c.RATE, input=True,
@@ -638,8 +653,9 @@ class Level(tools.State):
         button.press()
 
         self.point = point.Point(button.rect.x,button.rect.y)
-        for scatter in self.scatter_group:
-            scatter.release()
+        for group in self.scatter_group_list:
+            for scatter in group:
+                scatter.release()
 
     def recording_stop(self):
         for button in self.button_group:
@@ -650,8 +666,6 @@ class Level(tools.State):
             self.p.terminate()
         self.recording = False
         self.frequencies = []
-        self.point.trace=[]
-        self.point=None
 
 
     def handle_audio_data(self,button_x, button_y, type):
@@ -681,17 +695,20 @@ class Level(tools.State):
             y = c.SCREEN_HEIGHT - int((freq / 1500) * c.SCREEN_HEIGHT)-64# 2000Hz 作为频率上限的缩放
             self.point.update(x,y)
             if type == 1:
+                scatter=None
                 self.point.fill=False
-                scatter = pg.sprite.spritecollideany(self.point, self.scatter_group)
-                if scatter:
-                    scatter.press()
-                '''
-                for idx, (px, py) in enumerate(self.scatter_group):
-                    if not hit_points[idx]:  # 只检查未击中的点
-                        if px - 7 <= x <= px + 7 and abs(py - y) < 7:  # 检查是否穿过点
-                            hit_points[idx] = True  # 标记为已击中
-                            break
-                '''
+                for group in self.scatter_group_list:
+                    scatter = pg.sprite.spritecollideany(self.point, group)
+                    if scatter:
+                        scatter.press()
+                        group_idx=scatter.group
+                        num=self.check_press_number()
+                        if num%4==0 and not self.gen_flag:
+                            self.gen_flag=True
+                            for data in self.map_data[c.MAP_NEWBRICK][group_idx][str(group_idx)]:
+                                brick.create_brick(self.brick_group, data, self)
+
+
 
 
 
@@ -711,8 +728,17 @@ class Level(tools.State):
         self.slider_group.draw(self.level)
         self.pipe_group.draw(self.level)
 
+        if self.player.message:
+            message_x=self.player.rect.x+200
+            message_y=self.player.rect.y-200
+            box_rect = pg.Rect(message_x,message_y, 400, 200)
+            pg.draw.rect(self.level, c.GRAY, box_rect)
+            pg.draw.rect(self.level, c.BLACK, box_rect, 3)
+            text = font.render("fuck you sb", True, c.RED)
+
         self.button_group.draw(self.level)
-        self.scatter_group.draw(self.level)
+        for group in self.scatter_group_list:
+            group.draw(self.level)
 
         if self.point:
             if self.point.trace and self.point.fill:
