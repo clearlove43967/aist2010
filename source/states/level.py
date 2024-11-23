@@ -461,9 +461,11 @@ class Level(tools.State):
 
         if bridge_segment:
             # Adjust player position for the bridge
-            self.player.rect.bottom = bridge_segment.top
-            self.player.y_vel = 0
-            self.player.state = c.WALK
+            if self.player.y_vel >= 0:  # Ensure the player is falling or standing
+                self.player.rect.bottom = bridge_segment.top
+                self.player.y_vel = 0
+                if self.player.state != c.JUMP:
+                    self.player.state = c.WALK
 
         if box:
             self.adjust_player_for_y_collisions(box)
@@ -506,7 +508,7 @@ class Level(tools.State):
                         shell.rect.right = self.player.rect.left - 5
         self.check_is_falling(self.player)
         self.check_if_player_on_IN_pipe()
-    
+
     def prevent_collision_conflict(self, sprite1, sprite2):
         if sprite1 and sprite2:
             distance1 = abs(self.player.rect.centerx - sprite1.rect.centerx)
@@ -516,7 +518,7 @@ class Level(tools.State):
             else:
                 sprite1 = False
         return sprite1, sprite2
-        
+
     def adjust_player_for_y_collisions(self, sprite):
         if self.player.rect.top > sprite.rect.top:
             if sprite.name == c.MAP_BRICK:
@@ -537,7 +539,7 @@ class Level(tools.State):
             elif (sprite.name == c.MAP_PIPE and
                 sprite.type == c.PIPE_TYPE_HORIZONTAL):
                 return
-            
+
             self.player.y_vel = 7
             self.player.rect.top = sprite.rect.bottom
             self.player.state = c.FALL
@@ -551,7 +553,7 @@ class Level(tools.State):
             else:
                 self.player.state = c.WALK
 
-    
+
     def check_if_enemy_on_brick_box(self, brick):
         brick.rect.y -= 5
         enemy = pg.sprite.spritecollideany(brick, self.enemy_group)
@@ -704,9 +706,13 @@ class Level(tools.State):
             if type == 0:
                 self.point.fill = True
                 if len(self.point.trace) > self.player_x:
-                    for i in range(len(self.point.trace)):
-                        # Pass the updated points to update_bridge
-                        self.update_bridge(self.point.trace)
+                    new_points = []
+                    for i, freq in enumerate(self.frequencies):
+                        x = i + button_x + 50
+                        y = c.SCREEN_HEIGHT - int((freq / 1500) * c.SCREEN_HEIGHT) - 64
+                        new_points.append((x, y))
+                    self.bridge_points = new_points
+                    self.update_bridge(self.bridge_points)
 
             if type == 1:
                 self.point.fill = False
