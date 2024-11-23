@@ -138,41 +138,41 @@
     ],
     "enemy":[
         {"0":[
-            
+            {"x":1120, "y":538, "direction":0, "type":0, "goomba_color":"do"}
         ]},
         {"1":[
-            {"x":1920, "y":538, "direction":0, "type":0, "color":0}
+            {"x":1920, "y":538, "direction":0, "type":0, "goomba_color":"re"}
         ]},
         {"2":[
-            {"x":2320, "y":538, "direction":0, "type":0, "color":0},
-            {"x":2380, "y":538, "direction":0, "type":0, "color":0}
+            {"x":2320, "y":538, "direction":0, "type":0, "goomba_color":"mi"},
+            {"x":2380, "y":538, "direction":0, "type":0, "goomba_color":"fa"}
         ]},
         {"3":[
-            {"x":3640, "y":193, "direction":0, "type":0, "color":0},
-            {"x":3700, "y":193, "direction":0, "type":0, "color":0}
+            {"x":3640, "y":193, "direction":0, "type":0, "goomba_color":"sol"},
+            {"x":3700, "y":193, "direction":0, "type":0, "goomba_color":"sol"}
         ]},
         {"4":[
-            {"x":4270, "y":538, "direction":0, "type":0, "color":0},
-            {"x":4330, "y":538, "direction":0, "type":0, "color":0}
+            {"x":4270, "y":538, "direction":0, "type":0, "goomba_color":"ti"},
+            {"x":4330, "y":538, "direction":0, "type":0, "goomba_color":"ti"}
         ]},
         {"5":[
             {"x":4700, "y":538, "direction":0, "type":1, "color":1}
         ]},
         {"6":[
-            {"x":4900, "y":538, "direction":0, "type":0, "color":0},
-            {"x":4960, "y":538, "direction":0, "type":0, "color":0}
+            {"x":4900, "y":538, "direction":0, "type":0, "goomba_color":"do"},
+            {"x":4960, "y":538, "direction":0, "type":0, "goomba_color":"re"}
         ]},
         {"7":[
-            {"x":5300, "y":538, "direction":0, "type":0, "color":0},
-            {"x":5360, "y":538, "direction":0, "type":0, "color":0}
+            {"x":5300, "y":538, "direction":0, "type":0, "goomba_color":"mi"},
+            {"x":5360, "y":538, "direction":0, "type":0, "goomba_color":"fa"}
         ]},
         {"8":[
-            {"x":5600, "y":538, "direction":0, "type":0, "color":0},
-            {"x":5660, "y":538, "direction":0, "type":0, "color":0}
+            {"x":5600, "y":538, "direction":0, "type":0, "goomba_color":"sol"},
+            {"x":5660, "y":538, "direction":0, "type":0, "goomba_color":"la"}
         ]},
         {"9":[
-            {"x":7550, "y":538, "direction":0, "type":0, "color":0},
-            {"x":7610, "y":538, "direction":0, "type":0, "color":0}
+            {"x":7550, "y":538, "direction":0, "type":0, "goomba_color":"ti"},
+            {"x":7610, "y":538, "direction":0, "type":0, "goomba_color":"do"}
         ]}
     ],
     "checkpoint":[
@@ -208,7 +208,8 @@
         {"x":8497, "y": 97, "type":2}
     ],
     "button":[
-        {"x":1300, "y":487, "type":0}
+        {"x":1300, "y":487, "type":1},
+        {"x":800, "y":487, "type":2}
     ],
     "scatter": [
         {"x":1350, "y":387},

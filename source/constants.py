@@ -31,7 +31,7 @@ GOLD         = (255, 215,   0)
 
 BGCOLOR = WHITE
 
-RATE = 44100
+RATE = 22050
 CHUNK = 1024
 
 SIZE_MULTIPLIER = 2.5
@@ -200,3 +200,25 @@ RELEASE = 'release'
 
 #SCATTER
 MAP_SCATTER = "scatter"
+
+#=================================
+ITEM_SHEET2 = 'item_objects(1)'
+GOOMBA_SHEET = 'goomba'
+
+# PITCHES
+DO = 'do'
+RE = 're'
+MI = 'mi'
+FA = 'fa'
+SOL = 'sol'
+LA = 'la'
+TI = 'ti'
+
+FREQ_DO = 261.6
+FREQ_RE = 293.6
+FREQ_MI = 329.6
+FREQ_FA = 349.2
+FREQ_SOL = 392
+FREQ_LA = 440
+FREQ_TI = 493.8
+TOLERANCE = 20

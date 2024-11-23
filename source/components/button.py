@@ -1,5 +1,6 @@
 import pygame as pg
 from .. import setup, tools
+from source.components import powerup
 from .. import constants as c
 
 class Button(pg.sprite.Sprite):
@@ -8,6 +9,7 @@ class Button(pg.sprite.Sprite):
 
         self.frames = []
         #self.frame_index = 0
+        self.type = type
         self.load_frames(frame_rect_list)
         self.is_pressed = False
         self.image = self.frames[0]
@@ -15,13 +17,16 @@ class Button(pg.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         #self.animation_timer = 0
-        self.type = type
-        self.scatters=scatter
+        self.scatters = scatter
         self.name = name
 
 
-    def load_frames(self,frame_rect_list):
-        sheet = setup.GFX['item_objects']
+    def load_frames(self, frame_rect_list):
+        if self.type == 2:
+            sheet = setup.GFX['item_objects(1)']
+            frame_rect_list = [(287, 171, 33, 18), (287, 171, 33, 18)]
+        else:
+            sheet = setup.GFX['item_objects']
         #frame_rect_list = [(0, 143, 15, 15), (0, 64, 16, 16)]
         for frame_rect in frame_rect_list:
             self.frames.append(tools.get_image(sheet, *frame_rect,
@@ -37,16 +42,21 @@ class Button(pg.sprite.Sprite):
         if self.is_pressed:
             self.is_pressed = False
 
+    def shoot_bullet(self, pitch, powerup_group):
+        print(pitch)
+        powerup_group.add(powerup.FireBall(self.rect.right, self.rect.y, True, pitch))
+
 
 
 class ScatterButton(Button):
     def __init__(self, x, y, type, frame_rect_list, scatter, name=c.MAP_BUTTON):
         super().__init__(x, y, type, frame_rect_list, scatter, name)
         self.load_frames(frame_rect_list)
-        self.scatters=pg.sprite.Group()
+        self.scatters = pg.sprite.Group()
         self.generate_scatter(scatter)
 
-    def generate_scatter(self,positions):
+    def generate_scatter(self, positions):
         for position in positions:
             self.scatters.add()
+
 
