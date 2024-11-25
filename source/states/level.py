@@ -431,6 +431,7 @@ class Level(tools.State):
         powerup = pg.sprite.spritecollideany(self.player, self.powerup_group)
         coin = pg.sprite.spritecollideany(self.player, self.static_coin_group)
         button =  pg.sprite.spritecollideany(self.player, self.button_group)
+        bridge_segment = self.bridge.check_collision(self.player)
 
         if button and not self.recording:
             self.player.message=True
@@ -522,6 +523,14 @@ class Level(tools.State):
         elif coin:
             self.update_score(100, coin, 1)
             coin.kill()
+        elif bridge_segment:
+            if bridge_segment.height > 3 * bridge_segment.width:
+                self.player.y_vel = 0
+                self.player.x_vel = 0
+                if self.player.rect.x < bridge_segment.x:
+                    self.player.rect.right = bridge_segment.left - 1
+                else:
+                    self.player.rect.left = bridge_segment.right + 1
 
     def adjust_player_for_x_collisions(self, collider):
         if collider.name == c.MAP_SLIDER:
@@ -552,6 +561,13 @@ class Level(tools.State):
                 self.player.rect.bottom = bridge_segment.top
                 self.player.y_vel = 0
             self.player.state = c.WALK
+            if bridge_segment.height > 3 * bridge_segment.width:
+                self.player.y_vel = 0
+                self.player.x_vel = 0
+                if self.player.rect.x < bridge_segment.x:
+                    self.player.rect.right = bridge_segment.left - 1
+                else:
+                    self.player.rect.left = bridge_segment.right + 1
 
         if box:
             self.adjust_player_for_y_collisions(box)
