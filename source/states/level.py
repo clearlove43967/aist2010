@@ -45,7 +45,12 @@ class Level(tools.State):
         self.setup_checkpoints()
         self.setup_flagpole()
         self.setup_sprite_groups()
-
+        self.p = pyaudio.PyAudio()
+        self.stream = self.p.open(format=pyaudio.paInt16, channels=1, rate=c.RATE, input=True,
+                                  frames_per_buffer=c.CHUNK)
+        # 丢弃前几帧数据以稳定麦克风
+        for _ in range(25):
+            self.stream.read(c.CHUNK)
         self.recording = False
         self.gen_flag = False
         self.frequencies=[]
@@ -749,16 +754,13 @@ class Level(tools.State):
         self.moving_score_list.append(stuff.Score(x, y, score))
 
     def recording_start(self, button):
+        print("tese")
         self.recording = True
         self.if_display_freq = True
         self.gen_flag = False
         self.frequencies = []
-        self.p = pyaudio.PyAudio()
-        self.stream = self.p.open(format=pyaudio.paInt16, channels=1, rate=c.RATE, input=True,
-                                  frames_per_buffer=c.CHUNK)
-        # 丢弃前几帧数据以稳定麦克风
-        for _ in range(25):
-            self.stream.read(c.CHUNK)
+
+
         button.press()
 
         self.bridge_points = []
@@ -773,10 +775,10 @@ class Level(tools.State):
     def recording_stop(self):
         for button in self.button_group:
             button.release()
-        if self.stream is not None:
-            self.stream.stop_stream()  # 停止音频流
-            self.stream.close()  # 关闭音频流
-            self.p.terminate()
+        #if self.stream is not None:
+        #    self.stream.stop_stream()  # 停止音频流
+        #    self.stream.close()  # 关闭音频流
+        #    self.p.terminate()
         self.recording = False
         self.if_display_freq = False
         self.frequencies = []
@@ -806,7 +808,7 @@ class Level(tools.State):
         self.point.trace.clear()
         for i, freq in enumerate(self.frequencies):
             x = i + button_x + 50
-            y = c.SCREEN_HEIGHT - int((freq / 1500) * c.SCREEN_HEIGHT)-64# 2000Hz 作为频率上限的缩放
+            y = c.SCREEN_HEIGHT - int((freq / 1500) * c.SCREEN_HEIGHT)-64       # 2000Hz 作为频率上限的缩放
             self.point.update(x, y)
             if type == 0:
                 self.point.fill = True
@@ -825,6 +827,8 @@ class Level(tools.State):
                 for group in self.scatter_group_list:
                     scatter = pg.sprite.spritecollideany(self.point, group)
                     if scatter:
+                        if not scatter.is_pressed:
+                            self.update_score(100, scatter)
                         scatter.press()
                         group_idx=scatter.group
                         num=self.check_press_number()
@@ -874,13 +878,14 @@ class Level(tools.State):
         self.static_coin_group.draw(self.level)
         self.slider_group.draw(self.level)
         self.pipe_group.draw(self.level)
-
+        '''
         if self.player.message:
             message_x=self.player.rect.x+200
             message_y=self.player.rect.y-200
             box_rect = pg.Rect(message_x,message_y, 400, 200)
             pg.draw.rect(self.level, c.GRAY, box_rect)
             pg.draw.rect(self.level, c.BLACK, box_rect, 3)
+        '''
 
         self.button_group.draw(self.level)
         for group in self.scatter_group_list:
