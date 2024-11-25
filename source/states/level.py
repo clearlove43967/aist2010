@@ -3,6 +3,7 @@ import time
 import os
 import json
 import pyaudio
+import math
 from scipy.fftpack import fft
 import numpy as np
 import pygame as pg
@@ -806,7 +807,7 @@ class Level(tools.State):
         self.point.trace.clear()
         for i, freq in enumerate(self.frequencies):
             x = i + button_x + 50
-            y = c.SCREEN_HEIGHT - int((freq / 1500) * c.SCREEN_HEIGHT)-64# 2000Hz 作为频率上限的缩放
+            y = c.SCREEN_HEIGHT - int((freq - math.mod(freq, 50) / 1500) * c.SCREEN_HEIGHT)-64# 2000Hz 作为频率上限的缩放
             self.point.update(x, y)
             if type == 0:
                 self.point.fill = True
