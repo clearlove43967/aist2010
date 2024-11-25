@@ -6,11 +6,11 @@
         {"start_x":6740, "end_x": 9086, "player_x": 270, "player_y":450}
     ],
     "ground":[
-        {"x":950,  "y":193, "width":5000, "height":6},
+        {"x":950,  "y":193, "width":6500, "height":6},
         {"x":   0, "y":538, "width":1285, "height":60},
         {"x":3107, "y":538, "width":1942, "height":60},
-        {"x":5280, "y":538, "width":1000, "height":60},
-        {"x":6647, "y":538, "width":3250, "height":60}
+        {"x":5260, "y":538, "width":1000, "height":60},
+        {"x":7673, "y":538, "width":3250, "height":60}
 
     ],
     "brick":[
@@ -35,7 +35,7 @@
         {"x":2444, "y":366, "width": 83, "height":170, "type":1},
         {"x":3107, "y":284, "width": 83, "height":52, "type":0},
         {"x":4956, "y":409, "width": 83, "height":126, "type":0},
-        {"x":6230, "y":454, "width": 83, "height": 84, "type":0},
+        {"x":6200, "y":454, "width": 83, "height": 84, "type":0},
         {"x":6987, "y":454, "width": 83, "height": 84, "type":0},
         {"x":7673, "y":451, "width": 83, "height": 84, "type":0},
         {"x":9724, "y":451, "width": 40, "height": 84, "type":2}
