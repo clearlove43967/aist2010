@@ -47,7 +47,7 @@
         "max_y_velocity":11,
         "walk_accel":0.15,
         "run_accel":0.3,
-        "jump_velocity":-10.5
+        "jump_velocity":-5.5
     }
     
 }
