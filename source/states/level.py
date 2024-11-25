@@ -754,7 +754,6 @@ class Level(tools.State):
         self.moving_score_list.append(stuff.Score(x, y, score))
 
     def recording_start(self, button):
-        print("tese")
         self.recording = True
         self.if_display_freq = True
         self.gen_flag = False
