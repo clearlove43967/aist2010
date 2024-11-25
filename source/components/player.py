@@ -192,7 +192,6 @@ class Player(pg.sprite.Sprite):
 
     def check_to_close_mesaage_box(self,keys):
         if keys[tools.keybinding["close"]]:
-            print("fuck")
             self.message=False
 
     def standing(self, keys, fire_group):

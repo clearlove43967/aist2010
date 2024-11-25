@@ -195,6 +195,7 @@ ENEMY_SHEET = 'smb_enemies_sheet'
 ITEM_SHEET = 'item_objects'
 
 #BUTTON STATES
+BUTTON_GROUP='group'
 PRESS = 'press'
 RELEASE = 'release'
 

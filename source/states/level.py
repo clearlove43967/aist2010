@@ -73,7 +73,10 @@ class Level(tools.State):
         frame_rect_list = [(0, 143, 15, 15), (0, 64, 16, 16)]
         if c.MAP_BUTTON in self.map_data:
             for data in self.map_data[c.MAP_BUTTON]:
-                self.button_group.add(button.Button(data['x'], data['y'], frame_rect_list, data['type']))
+                if c.BUTTON_GROUP in data:
+                    self.button_group.add(button.Button(data['x'], data['y'], frame_rect_list, data['type'], data['group']))
+                else:
+                    self.button_group.add(button.Button(data['x'], data['y'], frame_rect_list, data['type']))
 
     def setup_scatters(self):
         self.scatter_group_list=[]
@@ -440,19 +443,21 @@ class Level(tools.State):
 
         if button and not self.recording:
             self.player.message=True
+            self.start_time = time.time()
             self.recording_start(button)
 
         if self.recording and not button:
             self.recording_stop()
 
-        if self.recording and not self.player.message:
+        if time.time()-self.start_time<5 and self.recording and not self.player.message:
             x, y = button.rect.x, button.rect.y
+            group = button.group
             type = button.type
             # cannon
             if button.type == 2:
                 self.cannon_audio(button, self.powerup_group)
             else:
-                self.handle_audio_data(x, y, type)
+                self.handle_audio_data(x, y, type, group)
         
 
         if box:
@@ -759,16 +764,14 @@ class Level(tools.State):
         self.gen_flag = False
         self.frequencies = []
 
-
         button.press()
 
         self.bridge_points = []
-
         self.bridge = bridge.Bridge(self.bridge_points)
 
         self.point = point.Point(button.rect.x, button.rect.y)
-        for group in self.scatter_group_list:
-            for scatter in group:
+        if button.group:
+            for scatter in self.scatter_group_list[button.group]:
                 scatter.release()
 
     def recording_stop(self):
@@ -783,7 +786,7 @@ class Level(tools.State):
         self.frequencies = []
 
 
-    def handle_audio_data(self,button_x, button_y, type):
+    def handle_audio_data(self,button_x, button_y, type,group):
         data = np.frombuffer(self.stream.read(c.CHUNK), dtype=np.int16) / 32768.0  # 归一化
         pitch = get_pitch(data)  # 获取当前音调频率
         self.frequencies.append(pitch)
@@ -821,20 +824,22 @@ class Level(tools.State):
                     self.update_bridge(self.bridge_points)
 
             if type == 1:
+                print(type,group)
                 scatter=None
+                all_scatters_collision_flag=True
                 self.point.fill=False
-                for group in self.scatter_group_list:
-                    scatter = pg.sprite.spritecollideany(self.point, group)
-                    if scatter:
+                scatter = pg.sprite.spritecollideany(self.point, self.scatter_group_list[group])
+                if scatter:
+                    if not scatter.is_pressed:
+                        self.update_score(100, scatter)
+                    scatter.press()
+                    for scatter in self.scatter_group_list[group]:
                         if not scatter.is_pressed:
-                            self.update_score(100, scatter)
-                        scatter.press()
-                        group_idx=scatter.group
-                        num=self.check_press_number()
-                        if num%4==0 and not self.gen_flag:
-                            self.gen_flag=True
-                            for data in self.map_data[c.MAP_NEWBRICK][group_idx][str(group_idx)]:
-                                brick.create_brick(self.brick_group, data, self)
+                            all_scatters_collision_flag = False
+                    if all_scatters_collision_flag and not self.gen_flag:
+                        self.gen_flag=True
+                        for data in self.map_data[c.MAP_NEWBRICK][group][str(group)]:
+                            brick.create_brick(self.brick_group, data, self)
 
 
 
