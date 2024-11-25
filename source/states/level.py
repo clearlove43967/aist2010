@@ -70,7 +70,7 @@ class Level(tools.State):
 
     def setup_buttons(self):
         self.button_group = pg.sprite.Group()
-        frame_rect_list = [(0, 143, 15, 15), (0, 64, 16, 16)]
+        frame_rect_list = [(0, 64, 16, 16), (48, 64, 16, 16)]
         if c.MAP_BUTTON in self.map_data:
             for data in self.map_data[c.MAP_BUTTON]:
                 if c.BUTTON_GROUP in data:
