@@ -74,9 +74,9 @@ class Level(tools.State):
         if c.MAP_BUTTON in self.map_data:
             for data in self.map_data[c.MAP_BUTTON]:
                 if c.BUTTON_GROUP in data:
-                    self.button_group.add(button.Button(data['x'], data['y'], frame_rect_list, data['type'], data['group']))
+                    self.button_group.add(button.Button(data['x'], data['y'], frame_rect_list, data['type'],data['time'], data['group']))
                 else:
-                    self.button_group.add(button.Button(data['x'], data['y'], frame_rect_list, data['type']))
+                    self.button_group.add(button.Button(data['x'], data['y'], frame_rect_list, data['type'],data['time']))
 
     def setup_scatters(self):
         self.scatter_group_list=[]
@@ -438,7 +438,7 @@ class Level(tools.State):
         shell = pg.sprite.spritecollideany(self.player, self.shell_group)
         powerup = pg.sprite.spritecollideany(self.player, self.powerup_group)
         coin = pg.sprite.spritecollideany(self.player, self.static_coin_group)
-        button =  pg.sprite.spritecollideany(self.player, self.button_group)
+        button = pg.sprite.spritecollideany(self.player, self.button_group)
         bridge_segment = self.bridge.check_collision(self.player)
 
         if button and not self.recording:
@@ -449,7 +449,7 @@ class Level(tools.State):
         if self.recording and not button:
             self.recording_stop()
 
-        if time.time()-self.start_time<5 and self.recording and not self.player.message:
+        if button and time.time() - self.start_time < int(button.time) and self.recording and not self.player.message:
             x, y = button.rect.x, button.rect.y
             group = button.group
             type = button.type
