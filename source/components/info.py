@@ -59,12 +59,12 @@ class Info():
         self.time_label = []
         self.stage_label = []
 
-        self.create_label(self.score_text, '000000', 75, 55)
-        self.create_label(self.coin_count_text, '*00', 300, 55)
-        self.create_label(self.mario_label, 'MARIO', 75, 30)
-        self.create_label(self.world_label, 'WORLD', 450, 30)
-        self.create_label(self.time_label, 'TIME', 625, 30)
-        self.create_label(self.stage_label, '1-1', 472, 55)
+        self.create_label(self.score_text, '000000', 112.5, 55)
+        self.create_label(self.coin_count_text, '*00', 450, 55)
+        self.create_label(self.mario_label, 'MARIO', 112.5, 30)
+        self.create_label(self.world_label, 'WORLD', 675, 30)
+        self.create_label(self.time_label, 'TIME', 937.5, 30)
+        self.create_label(self.stage_label, '1-1', 708, 55)
 
         self.info_labels = [self.score_text, self.coin_count_text, self.mario_label,
                     self.world_label, self.time_label, self.stage_label]
