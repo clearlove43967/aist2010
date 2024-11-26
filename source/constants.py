@@ -28,6 +28,7 @@ BLACK        = (  0,   0,   0)
 NEAR_BLACK   = ( 19,  15,  48)
 COMBLUE      = (233, 232, 255)
 GOLD         = (255, 215,   0)
+LINE_ORANGE  = (231,  90,  16)
 
 BGCOLOR = WHITE
 
