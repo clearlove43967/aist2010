@@ -21,6 +21,7 @@ class Player(pg.sprite.Sprite):
         self.setup_speed()
         self.load_images()
         self.message=False
+        self.up_pipe_y = 451
 
 
 
