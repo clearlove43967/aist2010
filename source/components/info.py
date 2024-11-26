@@ -21,7 +21,7 @@ class Info():
         self.create_font_image_dict()
         self.create_info_labels()
         self.create_state_labels()
-        self.flashing_coin = coin.FlashCoin(280, 53)
+        self.flashing_coin = coin.FlashCoin(420, 53)
         
     def create_font_image_dict(self):
         self.image_dict = {}
@@ -63,8 +63,8 @@ class Info():
         self.create_label(self.coin_count_text, '*00', 450, 55)
         self.create_label(self.mario_label, 'MARIO', 112.5, 30)
         self.create_label(self.world_label, 'WORLD', 675, 30)
-        self.create_label(self.time_label, 'TIME', 937.5, 30)
-        self.create_label(self.stage_label, '1-1', 708, 55)
+        self.create_label(self.time_label, 'TIME', 950, 30)
+        self.create_label(self.stage_label, '1-1', 700, 55)
 
         self.info_labels = [self.score_text, self.coin_count_text, self.mario_label,
                     self.world_label, self.time_label, self.stage_label]
@@ -85,9 +85,9 @@ class Info():
     def create_player_image(self):
         self.life_times_image = tools.get_image(setup.GFX['text_images'], 
                                 75, 247, 6, 6, (92, 148, 252), 2.9)
-        self.life_times_rect = self.life_times_image.get_rect(center=(378, 295))
+        self.life_times_rect = self.life_times_image.get_rect(center=(567, 295))
         self.life_total_label = []
-        self.create_label(self.life_total_label, str(self.total_lives), 450, 285)
+        self.create_label(self.life_total_label, str(self.total_lives), 675, 285)
         
         if self.game_info[c.PLAYER_NAME] == c.PLAYER_MARIO:
             rect = (178, 32, 12, 16)
@@ -95,7 +95,7 @@ class Info():
             rect = (178, 128, 12, 16)
         self.player_image = tools.get_image(setup.GFX['mario_bros'], 
                                 *rect, (92, 148, 252), 2.9)
-        self.player_rect = self.player_image.get_rect(center=(320, 290))
+        self.player_rect = self.player_image.get_rect(center=(480, 290))
 
     def create_main_menu_labels(self):
         mario_game = []
@@ -103,10 +103,10 @@ class Info():
         top = []
         top_score = []
 
-        self.create_label(mario_game, c.PLAYER1, 272, 360)
-        self.create_label(luigi_game, c.PLAYER2, 272, 405)
-        self.create_label(top, 'TOP - ', 290, 465)
-        self.create_label(top_score, '000000', 400, 465)
+        self.create_label(mario_game, c.PLAYER1, 428, 360)
+        self.create_label(luigi_game, c.PLAYER2, 428, 405)
+        self.create_label(top, 'TOP - ', 435, 465)
+        self.create_label(top_score, '000000', 600, 465)
         self.state_labels = [mario_game, luigi_game, top, top_score,
                             *self.info_labels]
     
@@ -114,8 +114,8 @@ class Info():
         world_label = []
         self.stage_label2 = []
 
-        self.create_label(world_label, 'WORLD', 280, 200)
-        self.create_label(self.stage_label2, '1-1', 430, 200)
+        self.create_label(world_label, 'WORLD', 420, 200)
+        self.create_label(self.stage_label2, '1-1', 645, 200)
         self.state_labels = [world_label, self.stage_label2,
                 *self.info_labels, self.life_total_label]
 
@@ -124,21 +124,21 @@ class Info():
         self.current_time = 0
 
         self.clock_time_label = []
-        self.create_label(self.clock_time_label, str(self.time), 645, 55)
+        self.create_label(self.clock_time_label, str(self.time), 967.5, 55)
         self.state_labels = [*self.info_labels, self.clock_time_label]
 
     def create_game_over_labels(self):
         game_label = []
         over_label = []
         
-        self.create_label(game_label, 'GAME', 280, 300)
-        self.create_label(over_label, 'OVER', 400, 300)
+        self.create_label(game_label, 'GAME', 420, 300)
+        self.create_label(over_label, 'OVER', 600, 300)
         
         self.state_labels = [game_label, over_label, *self.info_labels]
 
     def create_time_out_labels(self):
         timeout_label = []
-        self.create_label(timeout_label, 'TIME OUT', 290, 310)
+        self.create_label(timeout_label, 'TIME OUT', 435, 310)
         self.state_labels = [timeout_label, *self.info_labels]
 
     def create_label(self, label_list, string, x, y):
