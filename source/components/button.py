@@ -4,7 +4,7 @@ from source.components import powerup
 from .. import constants as c
 
 class Button(pg.sprite.Sprite):
-    def __init__(self, x, y, frame_rect_list, type=None, time=None, group=None, name=c.MAP_BUTTON):
+    def __init__(self, x, y, frame_rect_list, type=None, dist=None, group=None, name=c.MAP_BUTTON):
         pg.sprite.Sprite.__init__(self)
 
         self.frames = []
@@ -16,10 +16,9 @@ class Button(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        #self.animation_timer = 0
         self.group = group
         self.name = name
-        self.time = time
+        self.dist = dist
 
 
     def load_frames(self, frame_rect_list):
@@ -50,8 +49,8 @@ class Button(pg.sprite.Sprite):
 
 
 class ScatterButton(Button):
-    def __init__(self, x, y, type, time, frame_rect_list, scatter, name=c.MAP_BUTTON):
-        super().__init__(x, y, type, time, frame_rect_list, scatter, name)
+    def __init__(self, x, y, type, dist, frame_rect_list, scatter, name=c.MAP_BUTTON):
+        super().__init__(x, y, type, dist, frame_rect_list, scatter, name)
         self.load_frames(frame_rect_list)
         self.scatters = pg.sprite.Group()
         self.generate_scatter(scatter)

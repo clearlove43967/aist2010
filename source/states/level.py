@@ -74,9 +74,9 @@ class Level(tools.State):
         if c.MAP_BUTTON in self.map_data:
             for data in self.map_data[c.MAP_BUTTON]:
                 if c.BUTTON_GROUP in data:
-                    self.button_group.add(button.Button(data['x'], data['y'], frame_rect_list, data['type'],data['time'], data['group']))
+                    self.button_group.add(button.Button(data['x'], data['y'], frame_rect_list, data['type'],data['dist'], data['group']))
                 else:
-                    self.button_group.add(button.Button(data['x'], data['y'], frame_rect_list, data['type'],data['time']))
+                    self.button_group.add(button.Button(data['x'], data['y'], frame_rect_list, data['type'],data['dist']))
 
     def setup_scatters(self):
         self.scatter_group_list=[]
@@ -443,13 +443,12 @@ class Level(tools.State):
 
         if button and not self.recording:
             self.player.message=True
-            self.start_time = time.time()
             self.recording_start(button)
 
         if self.recording and not button:
             self.recording_stop()
 
-        if button and time.time() - self.start_time < int(button.time) and self.recording and not self.player.message:
+        if button and self.point.trace[0][0] - self.point.trace[-1][0] < int(button.dist) and self.recording and not self.player.message:
             x, y = button.rect.x, button.rect.y
             group = button.group
             type = button.type
