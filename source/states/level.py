@@ -726,6 +726,10 @@ class Level(tools.State):
 
         if self.persist[c.LIVES] == 0:
             self.next = c.GAME_OVER
+            if self.stream is not None:
+                self.stream.stop_stream()
+                self.stream.close()
+                self.p.terminate()
         elif self.overhead_info.time == 0:
             self.next = c.TIME_OUT
         elif self.player.dead:
