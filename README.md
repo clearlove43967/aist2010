@@ -1,11 +1,11 @@
 # SuperNoisyMario
 A modified supermario game based on https://github.com/marblexu/PythonSuperMario.
-* A new map with different new enemies
-* Three different game mode：
+* Create a new map.
+* Three different challenges (you need to solve them with your voice)： 
 
-1) a
-2) b
-3) c
+  1) Turning your tone into a bridge of light, allowing Mario to cross the obstacle to the pipe in the other side. 
+  2) Make different tones and change the loudness of your voice to kill the enemies.
+  3) Control the pitch through the stars to generate your way forward.
 
 # Requirement
 * Python 3.7
@@ -16,7 +16,7 @@ A modified supermario game based on https://github.com/marblexu/PythonSuperMario
 $ python main.py
 
 # How to Play
-* use A/D key to control player
+* use key "A/D" to control player
 * use key 'W' to jump
 
 # Demo
