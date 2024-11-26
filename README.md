@@ -1,7 +1,11 @@
 # SuperNoisyMario
 A modified supermario game based on https://github.com/marblexu/PythonSuperMario.
 * A new map with different new enemies
-* Three different game mode
+* Three different game mode：
+
+1) a
+2) b
+3) c
 
 # Requirement
 * Python 3.7
