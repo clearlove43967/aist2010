@@ -892,11 +892,11 @@ class Level(tools.State):
         if self.point:
             if self.point.trace and self.point.fill:
                 fill_points = self.point.trace + [(self.point.trace[-1][0], c.SCREEN_HEIGHT), (self.point.trace[0][0], c.SCREEN_HEIGHT)]
-                pg.draw.polygon(self.level, c.YELLOW, fill_points)
+                pg.draw.polygon(self.level, c.LINE_ORANGE, fill_points)
 
             # 画出曲线
             if len(self.point.trace) > 1:
-                pg.draw.lines(self.level, c.ORANGE, False, self.point.trace, 2)
+                pg.draw.lines(self.level, c.LINE_ORANGE, False, self.point.trace, 2)
             self.point.draw_point(self.level)
 
         for score in self.moving_score_list:
