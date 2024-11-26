@@ -1,5 +1,5 @@
-# SuperMario
-A improved supermario game based on https://github.com/justinmeister/Mario-Level-1.
+# SuperNoisyMario
+A improved supermario game based on https://github.com/marblexu/PythonSuperMario.
 * support four levels：level 1-1 to level 1-4 
 * support go into the pipe
 * use json file to store level data (e.g. position of enemy, brick, box and pipe)
@@ -14,9 +14,8 @@ A improved supermario game based on https://github.com/justinmeister/Mario-Level
 $ python main.py
 
 # How to Play
-* use LEFT/RIGHT/DOWN key to control player
-* use key 'a' to jump
-* use key 's' to shoot firewall or run
+* use A/D key to control player
+* use key 'W' to jump
 
 # Demo
 ![level_1_1](https://raw.githubusercontent.com/marblexu/PythonSuperMario/master/resources/demo/level_1_1.png)
