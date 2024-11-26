@@ -442,13 +442,12 @@ class Level(tools.State):
         bridge_segment = self.bridge.check_collision(self.player)
 
         if button and not self.recording:
-            self.player.message=True
             self.recording_start(button)
 
         if self.recording and not button:
             self.recording_stop()
 
-        if button and self.point.trace[0][0] - self.point.trace[-1][0] < int(button.dist) and self.recording and not self.player.message:
+        if button and self.recording and len(self.point.trace) < button.dist:
             x, y = button.rect.x, button.rect.y
             group = button.group
             type = button.type
@@ -881,14 +880,6 @@ class Level(tools.State):
         self.static_coin_group.draw(self.level)
         self.slider_group.draw(self.level)
         self.pipe_group.draw(self.level)
-        '''
-        if self.player.message:
-            message_x=self.player.rect.x+200
-            message_y=self.player.rect.y-200
-            box_rect = pg.Rect(message_x,message_y, 400, 200)
-            pg.draw.rect(self.level, c.GRAY, box_rect)
-            pg.draw.rect(self.level, c.BLACK, box_rect, 3)
-        '''
 
         self.button_group.draw(self.level)
         for group in self.scatter_group_list:
