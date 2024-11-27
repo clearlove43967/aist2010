@@ -1,5 +1,6 @@
 __author__ = 'marble_xu'
 import time
+import math
 import os
 import json
 import pyaudio
@@ -9,6 +10,7 @@ import pygame as pg
 from .. import setup, tools
 from .. import constants as c
 from ..components import info, stuff, player, brick, box, enemy, powerup, coin, button, point,bridge
+from scipy.signal import butter, lfilter
 
 
 
@@ -16,7 +18,7 @@ class Level(tools.State):
     def __init__(self):
         tools.State.__init__(self)
         self.player = None
-        self.if_display_freq = False
+        self.button_type = None
 
     def startup(self, current_time, persist):
         self.game_info = persist
@@ -110,13 +112,13 @@ class Level(tools.State):
 
         # 音高频率和颜色的映射
         pitch_data = [
-            {"pitch": "Do", "freq": 261.6, "color": (255, 0, 0)},  # 红色
-            {"pitch": "Re", "freq": 293.6, "color": (165, 42, 42)},  # 棕色
-            {"pitch": "Mi", "freq": 329.6, "color": (0, 255, 0)},  # 绿色
-            {"pitch": "Fa", "freq": 349.2, "color": (128, 128, 128)},  # 灰色
-            {"pitch": "So", "freq": 392.0, "color": (255, 0, 255)},  # 紫红色
-            {"pitch": "La", "freq": 440.0, "color": (255, 255, 0)},  # 黄色
-            {"pitch": "Ti", "freq": 493.8, "color": (0, 0, 255)}  # 蓝色
+            {"pitch": "Do", "freq": 261.6, "color": (255, 0, 0)},
+            {"pitch": "Re", "freq": 293.6, "color": (165, 42, 42)},
+            {"pitch": "Mi", "freq": 329.6, "color": (0, 0, 255)},
+            {"pitch": "Fa", "freq": 349.2, "color": (0, 255, 0)},
+            {"pitch": "So", "freq": 392.0, "color": (128, 128, 128)},
+            {"pitch": "La", "freq": 440.0, "color": (255, 0, 255)},
+            {"pitch": "Ti", "freq": 493.8, "color": (255, 255, 0)}
         ]
 
         color = (255, 255, 255)  # 默认颜色为白色
@@ -148,27 +150,27 @@ class Level(tools.State):
 
         # 绿色 (Green)
         mi_text = "Mi: 329.6Hz"
-        mi_surface = font.render(mi_text, True, (0, 255, 0))  # 绿色
+        mi_surface = font.render(mi_text, True, (0, 0, 255))  # 绿色
         surface.blit(mi_surface, (10, 80))  # 第三行的位置
 
         # 灰色 (Gray)
         fa_text = "Fa: 349.2Hz"
-        fa_surface = font.render(fa_text, True, (128, 128, 128))  # 灰色
+        fa_surface = font.render(fa_text, True, (0, 255, 0))  # 灰色
         surface.blit(fa_surface, (10, 100))  # 第四行的位置
 
         # 紫红色 (Magenta)
         so_text = "So: 392.0Hz"
-        so_surface = font.render(so_text, True, (255, 0, 255))  # 紫红色
+        so_surface = font.render(so_text, True, (128, 128, 128))  # 紫红色
         surface.blit(so_surface, (10, 120))  # 第五行的位置
 
         # 黄色 (Yellow)
         la_text = "La: 440.0Hz"
-        la_surface = font.render(la_text, True, (255, 255, 0))  # 黄色
+        la_surface = font.render(la_text, True, (255, 0, 255))  # 黄色
         surface.blit(la_surface, (10, 140))  # 第六行的位置
 
         # 蓝色 (Blue)
         ti_text = "Ti: 493.8Hz"
-        ti_surface = font.render(ti_text, True, (0, 0, 255))  # 蓝色
+        ti_surface = font.render(ti_text, True, (255, 255, 0))  # 蓝色
         surface.blit(ti_surface, (10, 160))  # 第七行的位置
 
     def setup_maps(self):
@@ -271,6 +273,7 @@ class Level(tools.State):
     def setup_checkpoints(self):
         self.checkpoint_group = pg.sprite.Group()
         for data in self.map_data[c.MAP_CHECKPOINT]:
+            print(data)
             if c.ENEMY_GROUPID in data:
                 enemy_groupid = data[c.ENEMY_GROUPID]
             else:
@@ -309,9 +312,10 @@ class Level(tools.State):
         self.game_info[c.CURRENT_TIME] = self.current_time = current_time
         self.handle_states(keys)
         self.draw(surface)
-        if self.if_display_freq:
-            self.display_pitch_range(surface)
-            self.display_frequency(surface, self.current_freq)
+        if self.button_type == 2:
+            pass
+
+
 
     def handle_states(self, keys):
         self.update_all_sprites(keys)
@@ -453,7 +457,9 @@ class Level(tools.State):
             type = button.type
             # cannon
             if button.type == 2:
-                self.cannon_audio(button, self.powerup_group)
+                self.pitch_cannon(button, self.powerup_group)
+            elif button.type == 3:
+                self.volume_cannon(button, self.powerup_group)
             else:
                 self.handle_audio_data(x, y, type, group)
         
@@ -768,9 +774,7 @@ class Level(tools.State):
         self.if_display_freq = True
         self.gen_flag = False
         self.frequencies = []
-
         button.press()
-
         self.bridge_points = []
         self.bridge = bridge.Bridge(self.bridge_points)
 
@@ -846,32 +850,6 @@ class Level(tools.State):
                         for data in self.map_data[c.MAP_NEWBRICK][group][str(group)]:
                             brick.create_brick(self.brick_group, data, self)
 
-
-
-    def cannon_audio(self, button, powerup_group):
-        # 静态变量初始化
-        if not hasattr(self, '_last_shoot_time'):
-            self._last_shoot_time = 0  # 初始化上一次射击时间为0
-
-        data = np.frombuffer(self.stream.read(c.CHUNK), dtype=np.int16) / 32768.0  # 归一化
-
-        freq = get_pitch(data)
-        self.current_freq = freq
-        detected_pitch = check_frequency_match(freq)
-        print(detected_pitch)
-
-        # 获取当前时间
-        current_time = time.time()
-
-        # 检查时间间隔
-        if detected_pitch:
-            if current_time - self._last_shoot_time > 0.5:  # 如果时间间隔大于0.5秒
-                button.shoot_bullet(detected_pitch, powerup_group)  # 执行射击动作
-                self._last_shoot_time = current_time  # 更新上一次发射时间
-            else:
-                print("Shoot is cooling down.")  # 输出冷却提示
-        return
-
     def draw(self, surface):
         self.level.blit(self.background, self.viewport, self.viewport)
         self.powerup_group.draw(self.level)
@@ -911,6 +889,48 @@ class Level(tools.State):
         surface.blit(self.level, (0, 0), self.viewport)
         self.overhead_info.draw(surface)
 
+    def pitch_cannon(self, button, powerup_group):
+        # 静态变量初始化
+        self.button_type = 2
+        if not hasattr(self, '_last_shoot_time'):
+            self._last_shoot_time = 0  # 初始化上一次射击时间为0
+
+        data = np.frombuffer(self.stream.read(c.CHUNK), dtype=np.int16) / 32768.0  # 归一化
+
+        freq = get_frequency(data)
+        self.current_freq = freq
+        detected_pitch = check_frequency_match(freq)
+        print(detected_pitch)
+
+        # 获取当前时间
+        current_time = time.time()
+
+        # 检查时间间隔
+        if detected_pitch:
+            if current_time - self._last_shoot_time > 0.3:  # 如果时间间隔大于0.5秒
+                button.shoot_pitch_bullet(detected_pitch, powerup_group)  # 执行射击动作
+                self._last_shoot_time = current_time  # 更新上一次发射时间
+            else:
+                print("Shoot is cooling down.")  # 输出冷却提示
+        self.display_pitch_range(self.level)
+        self.display_frequency(self.level, self.current_freq)
+        return
+
+    def volume_cannon(self, button, powerup_group):
+        if not hasattr(self, '_last_shoot_time'):
+            self._last_shoot_time = 0  # 初始化上一次射击时间为0
+
+        data = np.frombuffer(self.stream.read(c.CHUNK), dtype=np.int16)  # 归一化
+
+        volume = get_volume(data)
+        print("volume is " + str(volume))
+        current_time = time.time()
+        if volume > c.VOLUME_THRESHOLD:
+            if current_time - self._last_shoot_time > 1:  # 如果时间间隔大于1秒
+                button.shoot_volume_bullet(powerup_group)  # 执行射击动作
+                self._last_shoot_time = current_time  # 更新上一次发射时间
+            else:
+                print("Shoot is cooling down.")  # 输出冷却提示
 
 def get_pitch(data):
     fft_data = fft(data)
@@ -924,18 +944,25 @@ def get_pitch(data):
     return peak_freq
 
 
-def get_frequency(self, data, rate):
-    """calculate frequency"""
-    n = len(data)
-    # Hanning window to decrease leakage
-    window = np.hanning(n)
-    data = data * window
-    fft = np.fft.rfft(data)
-    frequencies = np.fft.rfftfreq(n, 1 / rate)
-    magnitude = np.abs(fft)
-    # get the freq with maximum magnitude
-    peak_index = np.argmax(magnitude)
-    return frequencies[peak_index]
+def get_volume(data):
+    # Convert byte data to a numpy array (16-bit integer audio format)
+    audio_data = np.array(data, dtype=np.int64)
+    filtered_data = bandpass_filter(audio_data)
+    # Check for clipping or abnormalities
+    print("Audio data length:", len(audio_data))
+    print("Audio max value:", np.max(audio_data), "Audio min value:", np.min(audio_data))
+
+    # Compute the RMS (Root Mean Square) value of the audio signal
+    rms = np.sqrt(np.mean(filtered_data.astype(np.float64) ** 2))
+    print("RMS:", rms)
+
+    # Convert RMS to decibels
+    if rms > 0:
+        volume = 20 * np.log10(rms) + 25
+    else:
+        volume = -100.0  # Set a reasonable floor value for silence
+    print("volume is "+str(volume))
+    return volume
 
 
 def check_frequency_match(freq):
@@ -964,3 +991,36 @@ def check_frequency_match(freq):
         return frequency_dict[detected_pitch]
     else:
         return None
+
+def bandpass_filter(data, lowcut=80, highcut=505, fs=c.RATE, order=5):
+    """
+    Apply a bandpass filter to the data.
+    :param data: Input signal
+    :param lowcut: Lower cutoff frequency
+    :param highcut: Higher cutoff frequency
+    :param fs: Sampling rate (Hz)
+    :param order: Order of the filter
+    :return: Filtered signal
+    """
+    nyquist = 0.5 * fs  # Nyquist frequency
+    low = lowcut / nyquist
+    high = highcut / nyquist
+
+    # Design Butterworth filter
+    b, a = butter(order, [low, high], btype='band')
+    filtered_data = lfilter(b, a, data)
+    return filtered_data
+
+def get_frequency(data):
+    """calculate frequency"""
+    n = len(data)
+    rate = c.RATE
+    # Hanning window to decrease leakage
+    window = np.hanning(n)
+    data = data * window
+    fft = np.fft.rfft(data)
+    frequencies = np.fft.rfftfreq(n, 1 / rate)
+    magnitude = np.abs(fft)
+    # get the freq with maximum magnitude
+    peak_index = np.argmax(magnitude)
+    return frequencies[peak_index]

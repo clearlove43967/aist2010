@@ -188,32 +188,36 @@ class FireBall(Powerup):
                                (112, 176, 16, 16)]
             Powerup.__init__(self, x, y, setup.GFX[c.ITEM_SHEET2], frame_rect_list, c.SIZE_MULTIPLIER)
         elif pitch == c.MI:
+            frame_rect_list = [(255, 245, 9, 9), (263, 245, 9, 9),
+                               (255, 253, 9, 9), (263, 253, 9, 9),
+                               (112, 144, 16, 16), (112, 160, 16, 16),
+                               (112, 176, 16, 16)]
+
+            Powerup.__init__(self, x, y, setup.GFX[c.ITEM_SHEET2], frame_rect_list, c.SIZE_MULTIPLIER)
+        elif pitch == c.FA:
             frame_rect_list = [(255, 227, 9, 9), (263, 227, 9, 9),
                                (255, 235, 9, 9), (263, 235, 9, 9),
                                (112, 144, 16, 16), (112, 160, 16, 16),
                                (112, 176, 16, 16)]
+
             Powerup.__init__(self, x, y, setup.GFX[c.ITEM_SHEET2], frame_rect_list, c.SIZE_MULTIPLIER)
-        elif pitch == c.FA:
+        elif pitch == c.SOL:
             frame_rect_list = [(255, 263, 9, 9), (263, 263, 9, 9),
                                (255, 271, 9, 9), (263, 271, 9, 9),
                                (112, 144, 16, 16), (112, 160, 16, 16),
                                (112, 176, 16, 16)]
+
             Powerup.__init__(self, x, y, setup.GFX[c.ITEM_SHEET2], frame_rect_list, c.SIZE_MULTIPLIER)
-        elif pitch == c.SOL:
+        elif pitch == c.LA:
             frame_rect_list = [(255, 281, 9, 9), (263, 281, 9, 9),
                                (255, 289, 9, 9), (263, 289, 9, 9),
                                (112, 144, 16, 16), (112, 160, 16, 16),
                                (112, 176, 16, 16)]
-            Powerup.__init__(self, x, y, setup.GFX[c.ITEM_SHEET2], frame_rect_list, c.SIZE_MULTIPLIER)
-        elif pitch == c.LA:
-            frame_rect_list = [(255, 299, 9, 9), (263, 299, 9, 9),
-                               (255, 307, 9, 9), (263, 307, 9, 9),
-                               (112, 144, 16, 16), (112, 160, 16, 16),
-                               (112, 176, 16, 16)]
+
             Powerup.__init__(self, x, y, setup.GFX[c.ITEM_SHEET2], frame_rect_list, c.SIZE_MULTIPLIER)
         elif pitch == c.TI:
-            frame_rect_list = [(255, 245, 9, 9), (263, 245, 9, 9),
-                               (255, 253, 9, 9), (263, 253, 9, 9),
+            frame_rect_list = [(255, 299, 9, 9), (263, 299, 9, 9),
+                               (255, 307, 9, 9), (263, 307, 9, 9),
                                (112, 144, 16, 16), (112, 160, 16, 16),
                                (112, 176, 16, 16)]
             Powerup.__init__(self, x, y, setup.GFX[c.ITEM_SHEET2], frame_rect_list, c.SIZE_MULTIPLIER)
@@ -293,3 +297,67 @@ class FireBall(Powerup):
         self.state = c.EXPLODING
 
 
+class FireMisso(Powerup):
+    def __init__(self, x, y, facing_right):
+        frame_rect_list = [(386, 128, 26, 8), (387, 135, 26, 8),
+                           (112, 144, 16, 16), (112, 160, 16, 16),
+                           (112, 176, 16, 16)]
+        Powerup.__init__(self, x, y, setup.GFX[c.ITEM_SHEET2], frame_rect_list, c.SIZE_MULTIPLIER)
+        self.type = c.TYPE_FIREMISSO
+        self.gravity = 0.05
+        self.state = c.FLYING
+        self.rect.x = x
+        self.x_vel = 12
+        self.rect.y = 497
+        self.direction = c.RIGHT
+
+    def update(self, game_info, level):
+        self.current_time = game_info[c.CURRENT_TIME]
+        if self.state == c.FLYING or self.state == c.BOUNCING:
+            self.y_vel += self.gravity
+            if (self.current_time - self.animate_timer) > 200:
+
+                self.frame_index = (self.frame_index + 1) % 2
+                self.animate_timer = self.current_time
+            self.update_position(level)
+            # print(self.rect.right)
+        elif self.state == c.EXPLODING:
+            if (self.current_time - self.animate_timer) > 50:
+                if self.frame_index < 4:
+                    self.frame_index += 1
+                else:
+                    self.kill()
+                self.animate_timer = self.current_time
+        self.animation()
+
+    def check_x_collisions(self, level):
+        sprite_group = pg.sprite.Group(level.ground_step_pipe_group,
+                                       level.brick_group, level.box_group)
+        sprite = pg.sprite.spritecollideany(self, sprite_group)
+        if sprite:
+            self.change_to_explode()
+
+    def check_y_collisions(self, level):
+        sprite_group = pg.sprite.Group(level.ground_step_pipe_group,
+                                       level.brick_group, level.box_group)
+
+        sprite = pg.sprite.spritecollideany(self, sprite_group)
+        enemy = pg.sprite.spritecollideany(self, level.enemy_group)
+        if sprite:
+            if self.rect.top > sprite.rect.top:
+                self.change_to_explode()
+            else:
+                self.rect.bottom = sprite.rect.y
+                self.y_vel = -8
+                if self.direction == c.RIGHT:
+                    self.x_vel = 15
+                else:
+                    self.x_vel = -15
+                self.state = c.BOUNCING
+        elif enemy:
+            enemy.start_death_jump(self.direction)
+            self.change_to_explode()
+
+    def change_to_explode(self):
+        self.frame_index = 4
+        self.state = c.EXPLODING

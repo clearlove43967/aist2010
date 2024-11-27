@@ -5,7 +5,7 @@ import pygame as pg
 from .. import setup, tools
 from .. import constants as c
 
-ENEMY_SPEED = 1
+ENEMY_SPEED = 0.8
 
 
 def create_enemy(item, level):
@@ -239,6 +239,7 @@ class Goomba(Enemy):
         Enemy.__init__(self)
         frame_rect_list = self.get_frame_rect(goomba_color)
         self.goomba_color = goomba_color
+        self.speed = 0.6
         self.setup_enemy(x, y, direction, name, setup.GFX[c.GOOMBA_SHEET],
                          frame_rect_list, in_range, range_start, range_end)
         # dead jump image
@@ -255,20 +256,20 @@ class Goomba(Enemy):
             frame_rect_list = [(0, 16, 16, 16), (16, 16, 16, 16),
                                (32, 16, 16, 16)]
         elif goomba_color == c.MI:
-            frame_rect_list = [(0, 32, 16, 16), (16, 32, 16, 16),
-                               (32, 32, 16, 16)]
+            frame_rect_list = [(0, 112, 16, 16), (16, 112, 16, 16),
+                               (32, 112, 16, 16)]
         elif goomba_color == c.FA:
             frame_rect_list = [(0, 48, 16, 16), (16, 48, 16, 16),
                                (32, 48, 16, 16)]
         elif goomba_color == c.SOL:
             frame_rect_list = [(0, 64, 16, 16), (16, 64, 16, 16),
-                               (32, 16, 16, 16)]
-        elif goomba_color == c.LA:
-            frame_rect_list = [(0, 64, 16, 16), (16, 64, 16, 16),
                                (32, 64, 16, 16)]
-        elif goomba_color == c.TI:
+        elif goomba_color == c.LA:
             frame_rect_list = [(0, 80, 16, 16), (16, 80, 16, 16),
                                (32, 80, 16, 16)]
+        elif goomba_color == c.TI:
+            frame_rect_list = [(0, 96, 16, 16), (16, 96, 16, 16),
+                               (32, 96, 16, 16)]
         return frame_rect_list
 
     def jumped_on(self):
@@ -279,11 +280,17 @@ class Goomba(Enemy):
         elif (self.current_time - self.death_timer) > 500:
             self.kill()
 
+    def walking(self):
+        if (self.current_time - self.animate_timer) > 250:
+            self.frame_index = (self.frame_index + 1) % 2
+            self.animate_timer = self.current_time
+
 
 class Koopa(Enemy):
     def __init__(self, x, y, direction, color, in_range,
                  range_start, range_end, name=c.KOOPA):
         Enemy.__init__(self)
+        print("kooooopaaa")
         frame_rect_list = self.get_frame_rect(color)
         self.setup_enemy(x, y, direction, name, setup.GFX[c.ENEMY_SHEET],
                          frame_rect_list, in_range, range_start, range_end)
