@@ -1,3 +1,4 @@
+
 {
     "image_name":"level_1",
     "maps":[
@@ -40,7 +41,7 @@
         {"x":8017, "y":237, "width": 46, "height": 44},
         {"x":8060, "y":194, "width": 46, "height": 44},
         {"x":8103, "y":194, "width": 46, "height":360},
-        
+
         {"x":8488, "y":495, "width": 43, "height": 44},
         {"x":9821, "y": 64, "width": 70, "height":530}
     ],
@@ -56,7 +57,7 @@
         {"1":[
              {"x":4800, "y":538, "direction":0, "type":1, "color":1},
              {"x":4900, "y":538, "direction":0, "type":1, "color":1},
-             {"x":4950, "y":538, "direction":0, "type":1, "color":1}
+             {"x":4850, "y":538, "direction":0, "type":1, "color":1}
         ]},
         {"2":[
 
