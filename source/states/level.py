@@ -801,6 +801,8 @@ class Level(tools.State):
         else:
             smoothed_pitch = pitch  # 如果不足窗口大小，则保持原值
 
+        self.frequencies[-1] = smoothed_pitch
+
         if len(self.frequencies) > c.SCREEN_WIDTH:
             self.frequencies.pop(0)
         self.point.trace.clear()
