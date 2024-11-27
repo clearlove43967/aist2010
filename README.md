@@ -18,7 +18,7 @@ $ python main.py
 # How to Play
 * use key "A/D" to control player
 * use key 'W' to jump
-* 
+  
 # Note
   1) For the first challenge, you need to keep the sound as smooth as possible. If the frequency bridge you built has severe ups and downs, please rebuild the bridge. Do not try to jump over some steep parts, you may get stuck. Please restart the game when you find that you are stuck.
   2) When you play this game, you need to ensure that the surrounding environment is relatively quiet, otherwise it will cause some trouble, as the game is sensitive to the loudness and frequency of the sound.
