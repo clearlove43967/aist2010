@@ -735,8 +735,11 @@ class Level(tools.State):
         elif self.player.dead:
             self.next = c.LOAD_SCREEN
         else:
-            self.game_info[c.LEVEL_NUM] += 1
-            self.next = c.LOAD_SCREEN
+            self.next = c.GAME_OVER
+            if self.stream is not None:
+                self.stream.stop_stream()
+                self.stream.close()
+                self.p.terminate()
 
     def update_viewport(self):
         third = self.viewport.x + self.viewport.w // 3
