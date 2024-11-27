@@ -1,5 +1,3 @@
-__author__ = 'marble_xu'
-
 import math
 import pygame as pg
 from .. import setup, tools

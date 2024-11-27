@@ -1,5 +1,3 @@
-__author__ = 'marble_xu'
-
 DEBUG = False
 DEBUG_START_X = 110
 DEBUG_START_y = 538

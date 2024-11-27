@@ -1,4 +1,3 @@
-__author__ = 'marble_xu'
 import time
 import math
 import os

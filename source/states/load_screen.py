@@ -1,5 +1,3 @@
-__author__ = 'marble_xu'
-
 from .. import setup, tools
 from .. import constants as c
 from ..components import info
