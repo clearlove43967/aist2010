@@ -18,7 +18,7 @@ class Level(tools.State):
         tools.State.__init__(self)
         self.player = None
         self.button_type = None
-
+        self.if_display_freq = False
     def startup(self, current_time, persist):
         self.game_info = persist
         self.persist = self.game_info
@@ -310,8 +310,9 @@ class Level(tools.State):
         self.game_info[c.CURRENT_TIME] = self.current_time = current_time
         self.handle_states(keys)
         self.draw(surface)
-        if self.button_type == 2:
-            pass
+        if self.if_display_freq:
+            self.display_pitch_range(surface)
+            self.display_frequency(surface, self.current_freq)
 
 
 
@@ -851,6 +852,9 @@ class Level(tools.State):
         self.slider_group.draw(self.level)
         self.pipe_group.draw(self.level)
 
+        # button = pg.sprite.spritecollideany(self.player, self.button_group)
+
+
         self.button_group.draw(self.level)
         for group in self.scatter_group_list:
             group.draw(self.level)
@@ -892,7 +896,7 @@ class Level(tools.State):
 
         # 检查时间间隔
         if detected_pitch:
-            if current_time - self._last_shoot_time > 0.3:  # 如果时间间隔大于0.5秒
+            if current_time - self._last_shoot_time > 0.3:  # 如果时间间隔大于0.3秒
                 button.shoot_pitch_bullet(detected_pitch, powerup_group)  # 执行射击动作
                 self._last_shoot_time = current_time  # 更新上一次发射时间
             else:
