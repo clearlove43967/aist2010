@@ -6,6 +6,7 @@
         {"start_x":2686, "end_x": 9086, "player_x": 264, "player_y":452}
     ],
     "ground":[
+        {"x":950,  "y":193, "width":4500, "height":6},
         {"x":   0, "y":538, "width":1285, "height":60},
         {"x":2933, "y":538, "width":2100, "height":60},
         {"x":5260, "y":538, "width":1000, "height":60},
@@ -37,6 +38,7 @@
         {"x":7673, "y":454, "width": 83, "height": 84, "type":0},
         {"x":9724, "y":451, "width": 40, "height": 84, "type":2}
     ],
+
     "step":[
         {"x":2221, "y":0, "width": 46, "height": 176},
         {"x":2221, "y":300, "width": 46, "height": 308},

@@ -273,7 +273,6 @@ class Level(tools.State):
     def setup_checkpoints(self):
         self.checkpoint_group = pg.sprite.Group()
         for data in self.map_data[c.MAP_CHECKPOINT]:
-            print(data)
             if c.ENEMY_GROUPID in data:
                 enemy_groupid = data[c.ENEMY_GROUPID]
             else:
@@ -396,14 +395,6 @@ class Level(tools.State):
             elif checkpoint.type == c.CHECKPOINT_TYPE_BOSS:
                 self.player.state = c.WALK_AUTO
             checkpoint.kill()
-
-    def check_press_number(self):
-        num=0
-        for group in self.scatter_group_list:
-            for scatter in group:
-                if scatter.is_pressed:
-                    num+=1
-        return num
 
     def update_flag_score(self):
         base_y = c.GROUND_HEIGHT - 80
@@ -777,19 +768,15 @@ class Level(tools.State):
         button.press()
         self.bridge_points = []
         self.bridge = bridge.Bridge(self.bridge_points)
-
         self.point = point.Point(button.rect.x, button.rect.y)
-        if button.group:
+
+        if button.group is not None:
             for scatter in self.scatter_group_list[button.group]:
                 scatter.release()
 
     def recording_stop(self):
         for button in self.button_group:
             button.release()
-        #if self.stream is not None:
-        #    self.stream.stop_stream()  # 停止音频流
-        #    self.stream.close()  # 关闭音频流
-        #    self.p.terminate()
         self.recording = False
         self.if_display_freq = False
         self.frequencies = []
@@ -833,7 +820,6 @@ class Level(tools.State):
                     self.update_bridge(self.bridge_points)
 
             if type == 1:
-                print(type,group)
                 scatter=None
                 all_scatters_collision_flag=True
                 self.point.fill=False
