@@ -58,6 +58,7 @@
              {"x":4800, "y":538, "direction":0, "type":1, "color":1},
              {"x":4900, "y":538, "direction":0, "type":1, "color":1},
              {"x":5200, "y":538, "direction":0, "type":1, "color":1}
+             {"x":5000, "y":538, "direction":0, "type":1, "color":1}
         ]},
         {"2":[
 
@@ -149,6 +150,7 @@
 
 
     "button":[
+
         {"x":4050, "y":487, "type":3, "dist":9999},
         {"x":3930, "y":487, "type":2, "dist":9999},
         {"x":1235, "y":403, "type":0, "dist":349},
