@@ -1,4 +1,4 @@
-# SuperNoisyMario
+# SouperMario
 A modified supermario game based on https://github.com/marblexu/PythonSuperMario.
 * Create a new map.
 * Three different challenges (you need to solve them with your voice)： 
