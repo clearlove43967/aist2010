@@ -836,6 +836,7 @@ class Level(tools.State):
                         for data in self.map_data[c.MAP_NEWBRICK][group][str(group)]:
                             brick.create_brick(self.brick_group, data, self)
 
+
     def draw(self, surface):
         self.level.blit(self.background, self.viewport, self.viewport)
         self.powerup_group.draw(self.level)
