@@ -288,7 +288,6 @@ class Koopa(Enemy):
     def __init__(self, x, y, direction, color, in_range,
                  range_start, range_end, name=c.KOOPA):
         Enemy.__init__(self)
-        print("kooooopaaa")
         frame_rect_list = self.get_frame_rect(color)
         self.setup_enemy(x, y, direction, name, setup.GFX[c.ENEMY_SHEET],
                          frame_rect_list, in_range, range_start, range_end)
