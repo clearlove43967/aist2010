@@ -1,5 +1,3 @@
-__author__ = 'marble_xu'
-
 import os
 import pygame as pg
 from abc import ABC, abstractmethod

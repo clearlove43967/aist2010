@@ -6,6 +6,7 @@
         {"start_x":2686, "end_x": 9086, "player_x": 264, "player_y":452}
     ],
     "ground":[
+        {"x":950,  "y":193, "width":4500, "height":6},
         {"x":   0, "y":538, "width":1285, "height":60},
         {"x":2933, "y":538, "width":2100, "height":60},
         {"x":5260, "y":538, "width":1000, "height":60},
@@ -31,12 +32,13 @@
         {"x":1972, "y":366, "width": 83, "height":170, "type":1},
         {"x":2444, "y":366, "width": 83, "height":170, "type":0},
         {"x":2942, "y":451, "width": 83, "height": 84, "type":0},
-        {"x":4956, "y":409, "width": 83, "height":126, "type":0},
+        {"x":4956, "y":429, "width": 83, "height":106, "type":0},
         {"x":6200, "y":454, "width": 83, "height": 84, "type":0},
         {"x":6987, "y":454, "width": 83, "height": 84, "type":0},
         {"x":7673, "y":454, "width": 83, "height": 84, "type":0},
         {"x":9724, "y":451, "width": 40, "height": 84, "type":2}
     ],
+
     "step":[
         {"x":2221, "y":0, "width": 46, "height": 176},
         {"x":2221, "y":300, "width": 46, "height": 308},
