@@ -795,7 +795,7 @@ class Level(tools.State):
 
         self.frequencies[-1] = smoothed_pitch
 
-        window_size = 5  # 平滑窗口大小（可根据需要调整）
+        window_size = 2  # 平滑窗口大小（可根据需要调整）
         if len(self.frequencies) >= window_size:
             smoothed_pitch = np.mean(self.frequencies[-window_size:])  # 取窗口内平均值
         else:
