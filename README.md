@@ -24,7 +24,6 @@ $ python main.py
   2) When you play this game, you need to ensure that the surrounding environment is relatively quiet, otherwise it will cause some trouble, as the game is sensitive to the loudness and frequency of the sound.
 
 # Demo
-![level_1_1](https://raw.githubusercontent.com/marblexu/PythonSuperMario/master/resources/demo/level_1_1.png)
-![level_1_2](https://raw.githubusercontent.com/marblexu/PythonSuperMario/master/resources/demo/level_1_2.png)
-![level_1_3](https://raw.githubusercontent.com/marblexu/PythonSuperMario/master/resources/demo/level_1_3.png)
-![level_1_4](https://raw.githubusercontent.com/marblexu/PythonSuperMario/master/resources/demo/level_1_4.png)
+![challenge_1](https://github.com/clearlove43967/aist2010/blob/master/resources/demo/challenge_1.png)
+![challenge_2](https://github.com/clearlove43967/aist2010/blob/master/resources/demo/challenge_2.png)
+![challenge_3](https://github.com/clearlove43967/aist2010/blob/master/resources/demo/challenge_3.png)
