@@ -26,3 +26,4 @@ $ python main.py
 # Demo
 ![challenge_1](https://github.com/clearlove43967/aist2010/blob/master/resources/demo/challenge_1.png)
 ![challenge_3](https://github.com/clearlove43967/aist2010/blob/master/resources/demo/challenge_3.png)
+![challenge_2]
