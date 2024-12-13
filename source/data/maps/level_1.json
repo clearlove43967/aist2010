@@ -109,7 +109,7 @@
         {"x":1973, "y":539, "width":80, "height": 10, "type":6, "map_index":1},
         {"x":8504, "y":-10, "width": 6, "height":600, "type":1},
         {"x":8780, "y":  0, "width":10, "height":600, "type":2},
-        {"x":2740, "y":360, "width":40, "height": 12, "type":3},
+        {"x":3100, "y":400, "width":40, "height": 12, "type":3},
         {"x":9731, "y":458, "width":10, "height": 70, "type":4},
         {"x":9800, "y":458, "width":10, "height": 70, "type":5, "map_index":2}
     ],
