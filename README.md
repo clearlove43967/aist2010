@@ -1,7 +1,7 @@
 # SuperNoisyMario
 A modified supermario game based on https://github.com/marblexu/PythonSuperMario.
 * Create a new map.
-* Three different challenges (you need to solve them with your voice)： 
+* Three different challenges (you need to solve them with your voice):
 
   1) Turning your tone into a bridge of light, allowing Mario to cross the obstacle to the pipe in the other side. 
   2) Make different tones and change the loudness of your voice to kill the enemies.
