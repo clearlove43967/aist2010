@@ -16,7 +16,7 @@ A modified supermario game based on https://github.com/marblexu/PythonSuperMario
 $ python main.py
 
 # How to Play
-* use key "A/D" to control player
+* use key "A/D" to control Mario
 * use key 'W' to jump
 * use key 'S' to enter pipe.
     
