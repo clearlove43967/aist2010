@@ -235,9 +235,10 @@ class Goomba(Enemy):
     def __init__(self, x, y, direction, goomba_color, in_range,
                  range_start, range_end, name=c.GOOMBA):
         Enemy.__init__(self)
+
         frame_rect_list = self.get_frame_rect(goomba_color)
         self.goomba_color = goomba_color
-        self.speed = 0.6
+        self.speed = 0.4
         self.setup_enemy(x, y, direction, name, setup.GFX[c.GOOMBA_SHEET],
                          frame_rect_list, in_range, range_start, range_end)
         # dead jump image
@@ -288,6 +289,7 @@ class Koopa(Enemy):
     def __init__(self, x, y, direction, color, in_range,
                  range_start, range_end, name=c.KOOPA):
         Enemy.__init__(self)
+        # print("kooooopaaa")
         frame_rect_list = self.get_frame_rect(color)
         self.setup_enemy(x, y, direction, name, setup.GFX[c.ENEMY_SHEET],
                          frame_rect_list, in_range, range_start, range_end)
